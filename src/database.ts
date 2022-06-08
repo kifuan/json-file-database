@@ -38,7 +38,7 @@ export type DatabaseOptions = {
      * 
      * It will do nothing after saving if it is undefined.
      */
-    onSaved?: () => void
+    onSaved?: (this: undefined) => void
 }
 
 /**
@@ -66,13 +66,13 @@ export function connectSync(options: DatabaseOptions) : Database {
 function createDatabase(data: any, options: DatabaseOptions) : Database {
     const { path, delay, onSaved } = options
 
+    // Save the data with the technology of "debouncing".
     let timeout: NodeJS.Timeout | undefined
-
     function save() {
         clearTimeout(timeout)
         timeout = setTimeout(() => {
             timeout = undefined
-            writeFile(path, JSON.stringify(data)).then(() => onSaved && onSaved())
+            writeFile(path, JSON.stringify(data)).then(() => onSaved?.apply(undefined))
         }, delay || 0)
     }
 

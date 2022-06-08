@@ -45,21 +45,21 @@ export class Collection<T> {
     }
 
     /**
-     * Inserts given data to the collection.
-     * @param data the data to be inserted
+     * Inserts given elements to the collection.
+     * @param els the elements to be inserted
      */
-    insert(...data: T[]) : void {
-        this.elements.push(...data)
+    insert(...els: T[]) : void {
+        this.elements.push(...els)
         this.save()
     }
 
     /**
-     * Updates the data that matches given condition.
-     * @param data the data to be updated
+     * Updates the element that matches given condition.
+     * @param el the element to be updated
      * @param cond the condition to match the element
-     * @return whether the data is updated
+     * @return whether the element is updated
      */
-    update(data: Partial<T> | T, cond: Condition<T> | T) : boolean {
+    update(el: Partial<T> | T, cond: Condition<T> | T) : boolean {
         const index = this.elements.findIndex(toCondition(cond))
         if (index === -1) {
             return false
@@ -67,20 +67,20 @@ export class Collection<T> {
 
         const found = this.elements[index]
         if (found instanceof Object) {
-            Object.assign(found, data)
+            Object.assign(found, el)
         } else {
             // Primitive types have no properties,
             // so it must be the type itself.
-            this.elements[index] = data as T
+            this.elements[index] = el as T
         }
         this.save()
         return true
     }
 
     /**
-     * Deletes the data that matches given condition.
+     * Deletes the element that matches given condition.
      * @param cond the condition to match the element
-     * @return whether the data is deleted
+     * @return whether the element is deleted
      */
     delete(cond: Condition<T> | T) : boolean {
         const index = this.elements.findIndex(toCondition(cond))
@@ -94,12 +94,31 @@ export class Collection<T> {
     }
 
     /**
-     * Finds the data.
+     * Finds the element.
      * @param cond the condition to match the element
-     * @returns the data that matches given condition, or undefined if there is not
+     * @returns the element that matches given condition, or undefined if there is not
      */
     find(cond: Condition<T> | T) : T | undefined {
         return this.elements.find(toCondition(cond))
+    }
+
+    /**
+     * Finds all elements that match given condition.
+     * It's better pass a function to match the elements.
+     * @param cond the condition to match elements
+     * @return all elements that match given condition
+     */
+    findAll(cond: Condition<T> | T) : T[] {
+        return this.elements.filter(toCondition(cond))
+    }
+
+    /**
+     * Checks whether there is a element that matches given condition.
+     * @param cond the condition to match the element
+     * @return whether there is a matched element
+     */
+    has(cond: Condition<T> | T) : boolean {
+        return this.find(cond) !== undefined
     }
 
     /**

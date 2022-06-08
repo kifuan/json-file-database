@@ -1,6 +1,7 @@
 import test, { ExecutionContext } from 'ava'
+import { unlinkSync, readdirSync, writeFileSync } from 'fs'
+import path from 'path'
 
-import { writeFileSync } from 'fs'
 import { connect, connectSync } from '../src'
 
 function sleep(delay: number) : Promise<void> {
@@ -27,6 +28,17 @@ test.beforeEach(t => {
     }))
 })
 
+test.after(t => {
+    readdirSync('test').forEach(name => {
+        if (!name.endsWith('json')) {
+            return
+        }
+        unlinkSync(path.join('test', name))
+    })
+    
+    t.log('Deleted all test database files.')
+})
+
 test('init', async t => {
     const db = await connect({
         path: getDatabasePath(t),
@@ -35,10 +47,10 @@ test('init', async t => {
         }
     })
 
-    const col = db<number>('nums')
+    const nums = db<number>('nums')
 
-    t.falsy(col.find(114))
-    t.truthy(col.find(123))
+    t.false(nums.has(114))
+    t.true(nums.has(123))
 })
 
 test('no-save', async t => {
@@ -50,10 +62,10 @@ test('no-save', async t => {
             t.fail()
         }
     })
-    t.truthy(db<number>('nums').find(123))
+    t.true(db<number>('nums').has(123))
 
-    t.log('sleep 100ms to make sure the database is not saved.')
-    await sleep(100)
+    t.log('Sleep 50ms to make sure the database is not saved.')
+    await sleep(50)
 
     t.true(notSaved)
 })
@@ -69,8 +81,8 @@ test('save', async t => {
 
     db<number>('nums').insert(114514)
 
-    t.log('sleep 100ms to make sure the database is saved.')
-    await sleep(100)
+    t.log('Sleep 50ms to make sure the database is saved.')
+    await sleep(50)
 
     t.true(saved)
 })
@@ -86,14 +98,18 @@ test('update', async t => {
     t.deepEqual(objs.find(obj => obj.id === 123), { id: 123, name: 'Liu Zhao' })
 
     nums.update(114514, 123)
-    t.truthy(nums.find(114514))
+    t.true(nums.has(114514))
 })
 
 test('sync', t => {
     const db = connectSync({
         path: getDatabasePath(t)
     })
-    t.truthy(db<number>('nums').find(123))
+
+    const nums = db<number>('nums')
+    t.true(nums.has(123))
+    t.true(nums.has(456))
+    t.true(nums.has(789))
 })
 
 test('list', async t => {
@@ -103,4 +119,20 @@ test('list', async t => {
 
     const list = db<number>('nums').list()
     t.deepEqual(list, [ 123, 456, 789 ])
+})
+
+test('find-and-has', async t => {
+    const db = await connect({
+        path: getDatabasePath(t)
+    })
+    
+    const nums = db<number>('nums')
+    const objs = db<{ id: number, name: string }>('objs')
+
+    t.deepEqual(nums.findAll(n => n < 700), [ 123, 456 ])
+    t.deepEqual(nums.find(n => n < 400), 123)
+
+    t.true(objs.has(u => u.id === 123 && u.name === 'San Zhang'))
+    t.true(objs.has(u => u.id === 456 && u.name === 'Si Li'))
+    t.true(objs.has(u => u.id === 789 && u.name === 'Wu Wang'))
 })

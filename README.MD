@@ -33,11 +33,19 @@ nums.insert(6)
 nums.update(123, 2)
 
 // Delete element 1.
-// You can give a function or a value to find the target element.
-nums.delete(n => n === 1)
+nums.delete(1)
 
-// Find element 2. It is undefined because we've replaced it before.
-console.log(nums.find(2))
+// Find elements that is smaller than 5.
+// It will be 3.
+console.log(nums.find(n => n < 5))
+
+// Finds all elements that is bigger than 5
+// It will be [ 123, 6 ]
+console.log(nums.findAll(n => n > 5))
+
+// Check whether 123 is in the collection.
+// It is true because we've updated 2 with 123.
+console.log(nums.has(123))
 
 // List the collection. It is [ 123, 3, 6 ].
 console.log(nums.list())
@@ -135,34 +143,34 @@ Here are the documentations.
 
   + Method `insert`
 
-    Inserts given data to the collection.
+    Inserts given elements to the collection.
 
     ```typescript
-    insert(...data: T[]): void
+    insert(...els: T[]): void
     ```
 
   + Method `update`
 
-    Updates the data that matches given condition.
+    Updates the element that matches given condition.
 
-    + `data`: the data to be updated
+    + `el`: the element to be updated
     + `cond`: the condition to match elements
-    + `return`: whether the data is updated
+    + `return`: whether the element is updated
 
     If the data is object, it will use `Object.assign` to assign properties to target object, otherwise replace the old value directly.
 
     If the condition is not function, it will be converted to `n => n === cond` as I said before.
 
     ```typescript
-    update(data: Partial<T> | T, cond: Condition<T> | T): boolean
+    update(el: Partial<T> | T, cond: Condition<T> | T): boolean
     ```
 
   + Method `delete`
 
-    Deletes the data that matches given condition.
+    Deletes the element that matches given condition.
 
     + `cond`: the condition to match elements
-    + `return`: whether the data is deleted
+    + `return`: whether the element is deleted
 
     ```typescript
     delete(cond: Condition<T> | T) : boolean
@@ -170,13 +178,37 @@ Here are the documentations.
 
   + Method `find`
 
-    Finds the data.
+    Finds the element.
 
     + `cond`: the condition to match the element
-    + `return`: the data that matches given condition, or undefined if there is not
+    + `return`: the element that matches given condition, or undefined if there is not
 
     ```typescript
     find(cond: Condition<T> | T) : T | undefined
+    ```
+
+  + Method `findAll`
+
+    Finds all elements that match given condition.
+
+    It's better pass a function to match the elements.
+
+    + `cond`: the condition to match elements
+    + `return`: all elements that match given condition
+
+    ```typescript
+    findAll(cond: Condition<T> | T) : T[]
+    ```
+
+  + Method `has`
+
+    Checks whether there is a element that matches given condition.
+
+    + `cond`: the condition to match the element
+    + `return`: whether there is a matched element
+
+    ```typescript
+    has(cond: Condition<T> | T) : boolean
     ```
 
   + Method `list`

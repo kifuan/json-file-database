@@ -75,7 +75,9 @@ function createDatabase(data: any, options: DatabaseOptions) : Database {
             writeFile(path, JSON.stringify(data)).then(() => onSaved && onSaved())
         }, delay || 0)
     }
+
     return <T>(name: string) => {
+        // Make sure the property is an array.
         const elements: T[] = data[name] ||= []
         if (!Array.isArray(elements)) {
             throw new TypeError(`Property ${name} in the database is not an array.`)

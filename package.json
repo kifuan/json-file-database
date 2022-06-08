@@ -1,0 +1,15 @@
+{
+  "name": "json-file-database",
+  "version": "1.0.0",
+  "description": "Database by JSON files",
+  "main": "dist/",
+  "scripts": {
+    "test": "tsc && ava"
+  },
+  "author": "kifuan",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^17.0.41",
+    "ava": "^4.3.0"
+  }
+}

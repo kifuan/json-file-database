@@ -1,5 +1,6 @@
 import { Collection } from './collection'
 import { readFile, writeFile } from 'fs/promises'
+import { readFileSync, writeFileSync } from 'fs'
 
 /**
  * The database type. It can be called when collection name,
@@ -46,27 +47,53 @@ export type DatabaseOptions = {
  * @return the database
  */
 export async function connect(options: DatabaseOptions) : Promise<Database> {
-    let { path, delay, init, onSaved } = options
-
+    const { path, init } = options
     const data = await readDatabaseFile(path, init)
-
-    return <T>(name: string) => {
-        return new Collection<T>({
-            delay: delay || 0,
-            name,
-            data,
-            async save() {
-                await writeFile(path, JSON.stringify(data))
-                onSaved && onSaved()
-            }
-        })
-    }
+    return createDatabase(data, options)
 }
 
-async function readDatabaseFile(path: string, init: any) : Promise<any> {
+/**
+ * Connects the database synchronously.
+ * @param options the options for connection
+ * @return the database
+ */
+export function connectSync(options: DatabaseOptions) : Database {
+    const { path, init } = options
+    const data = readDatabaseFileSync(path, init)
+    return createDatabase(data, options)
+}
+
+function createDatabase(data: any, options: DatabaseOptions) : Database {
+    const { path, delay, onSaved } = options
+
+    return <T>(name: string) => new Collection<T>({
+        delay: delay || 0,
+        name, data,
+        async save() {
+            await writeFile(path, JSON.stringify(data))
+            onSaved && onSaved()
+        }
+    })
+}
+
+async function readDatabaseFile(path: string, init?: any) : Promise<any> {
     try {
         return JSON.parse(await readFile(path, 'utf-8'))
     } catch (err) {
+        if (!init) {
+            throw err
+        }
+        return init
+    }
+}
+
+function readDatabaseFileSync(path: string, init?: any) : any {
+    try {
+        return JSON.parse(readFileSync(path, 'utf-8'))
+    } catch (err) {
+        if (!init) {
+            throw err
+        }
         return init
     }
 }

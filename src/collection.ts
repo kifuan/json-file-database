@@ -64,4 +64,8 @@ export class Collection<T> {
     find(predicate: Predicate<T>) : T | undefined {
         return this.array.find(predicate)
     }
+
+    get length() {
+        return this.array.length
+    }
 }

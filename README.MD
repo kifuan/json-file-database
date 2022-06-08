@@ -13,9 +13,9 @@ npm i json-file-database
 And then use it in your project like this:
 
 ```typescript
-import { connect } from 'json-file-database'
+import { connectSync } from 'json-file-database'
 
-const db = await connect({
+const db = connectSync({  // or use await connect({ ... })
     path: './db.json',
     init: { nums: [ 1, 2, 3 ] },
     delay: 1000,
@@ -203,9 +203,9 @@ I used tools like `typedoc` at first, but it was not suitable for this small pro
 In fact, once you installed it, you can easily use like this:
 
 ```typescript
-import { connect } from 'json-file-database'
+import { connectSync } from 'json-file-database'
 
-const db = await connect({
+const db = connectSync({  // or use await connect({ ... })
     path: './db.json',
     init: {
         nums: []

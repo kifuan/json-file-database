@@ -1,3 +1,6 @@
+/**
+ * The condition used to compare values.
+ */
 export type Condition<T> = (obj: T) => boolean
 
 /**
@@ -28,16 +31,14 @@ function toCondition<T>(cond: Condition<T> | T) : Condition<T> {
  * 
  * If you called methods that affect the collection,
  * it will start a so-called "debounced" function to save the data.
+ * 
+ * You should not create the collection by yourself.
+ * It is created by Database object.
  */
 export class Collection<T> {
     private readonly elements: T[]
     private readonly save: () => void
 
-    /**
-     * YOU SHOULD NOT CREATE COLLECTION BY YOURSELF.
-     * CALL THE RESULT OF connect OR connectSync.
-     * @param options the options of this collection
-     */
     constructor(options: CollectionOptions<T>) {
         this.elements = options.elements
         this.save = options.save
@@ -55,7 +56,7 @@ export class Collection<T> {
     /**
      * Updates the data that matches given condition.
      * @param data the data to be updated
-     * @param cond the condition to match elements
+     * @param cond the condition to match the element
      * @return whether the data is updated
      */
     update(data: Partial<T> | T, cond: Condition<T> | T) : boolean {
@@ -78,7 +79,7 @@ export class Collection<T> {
 
     /**
      * Deletes the data that matches given condition.
-     * @param cond the condition to match elements
+     * @param cond the condition to match the element
      * @return whether the data is deleted
      */
     delete(cond: Condition<T> | T) : boolean {
@@ -94,13 +95,18 @@ export class Collection<T> {
 
     /**
      * Finds the data.
-     * @param cond the condition to find
+     * @param cond the condition to match the element
      * @returns the data that matches given condition, or undefined if there is not
      */
     find(cond: Condition<T> | T) : T | undefined {
         return this.elements.find(toCondition(cond))
     }
 
+    /**
+     * Lists all elements the collection has.
+     * It will deep copy these elements.
+     * @return all elements it has
+     */
     list() : T[] {
         // Deep copy the elements.
         return JSON.parse(JSON.stringify(this.elements))
@@ -109,7 +115,7 @@ export class Collection<T> {
     /**
      * The length of this collection.
      */
-    get length() {
+    get length() : number {
         return this.elements.length
     }
 }

@@ -3,13 +3,15 @@ import { readFile, writeFile } from 'fs/promises'
 import { readFileSync } from 'fs'
 
 /**
- * The database type. It can be called with collection name,
+ * The database type that will be provided by connect or connectSync function.
+ * 
+ * It is a function that should be called with collection name and type,
  * and return the collection for you to operate.
  */
 export type Database = <T>(name: string) => Collection<T>
 
 /**
- * The JSON data. It must contain arrays as values,
+ * What the Database will operate. It must contain array-typed values.
  */
 export type JSONData = {
     [key: string] : any[]
@@ -41,9 +43,7 @@ export type DatabaseOptions = {
 
     /**
      * After the database file is saved,
-     * this function will be called.
-     * 
-     * It will do nothing after saving if it is undefined.
+     * this function will be called if it is not undefined.
      */
     onSaved?: (this: undefined) => void
 }

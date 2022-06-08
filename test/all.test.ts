@@ -1,4 +1,4 @@
-import test from 'ava'
+import test, { ExecutionContext } from 'ava'
 
 import { writeFileSync, unlinkSync } from 'fs'
 import { connect, connectSync } from '../src'
@@ -11,8 +11,13 @@ function sleep(delay: number) : Promise<void> {
     })
 }
 
-test.beforeEach(() => {
-    writeFileSync(PATH, JSON.stringify({
+function getDatabasePath(t: ExecutionContext<any>) {
+    const title = t.title.replace(/.+hook\sfor\s/, '')
+    return `test/test-${title}.json`
+}
+
+test.beforeEach(t => {
+    writeFileSync(getDatabasePath(t), JSON.stringify({
         nums: [ 123, 456, 789 ],
         objs: [
             { id: 123, name: 'San Zhang' },
@@ -20,11 +25,13 @@ test.beforeEach(() => {
             { id: 789, name: 'Wu Wang' }
         ]
     }))
+    t.log('prepare the database file')
+    t.pass()
 })
 
 test('init', async t => {
     const db = await connect({
-        path: PATH,
+        path: getDatabasePath(t),
         init: {
             nums: [ 114, 514 ]
         }
@@ -39,15 +46,16 @@ test('init', async t => {
 test('no-save', async t => {
     let notSaved = true
     const db = await connect({
-        path: PATH,
+        path: getDatabasePath(t),
         onSaved() {
             notSaved = false
+            t.fail()
         }
     })
     t.truthy(db<number>('nums').find(n => n === 123))
 
-    t.log('sleep 50ms to make sure the database is not saved.')
-    await sleep(50)
+    t.log('sleep 100ms to make sure the database is not saved.')
+    await sleep(100)
 
     t.true(notSaved)
 })
@@ -55,23 +63,34 @@ test('no-save', async t => {
 test('save', async t => {
     let saved = false
     const db = await connect({
-        path: PATH,
+        path: getDatabasePath(t),
         onSaved() {
             saved = true
         }
     })
 
-    t.true(db<number>('nums').update(114514, n => n === 123))
+    db<number>('nums').insert(114514)
 
-    t.log('sleep 50ms to make sure the database is saved.')
-    await sleep(50)
+    t.log('sleep 100ms to make sure the database is saved.')
+    await sleep(100)
 
-    t.true(saved)  
+    t.true(saved)
+})
+
+test('update', async t => {
+    const db = await connect({
+        path: getDatabasePath(t)
+    })
+    const objs = db<{id: number, name: string}>('objs')
+
+    objs.update({ id: 123, name: 'Liu Zhao' }, obj => obj.id === 123)
+
+    t.deepEqual(objs.find(obj => obj.id === 123), { id: 123, name: 'Liu Zhao' })
 })
 
 test('sync', t => {
     const db = connectSync({
-        path: PATH
+        path: getDatabasePath(t)
     })
     t.truthy(db<number>('nums').find(n => n === 123))
 })

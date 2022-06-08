@@ -10,6 +10,8 @@ function sleep(delay: number) : Promise<void> {
 }
 
 function getDatabasePath(t: ExecutionContext<any>) {
+    // The title in beforeEach hooks will be "before hook for xxx",
+    // so I'm gonna remove the "before hook for " and leave the "xxx".
     const title = t.title.replace(/.+hook\sfor\s/, '')
     return `test/test-${title}.json`
 }
@@ -23,7 +25,6 @@ test.beforeEach(t => {
             { id: 789, name: 'Wu Wang' }
         ]
     }))
-    t.log('prepare the database file')
 })
 
 test('init', async t => {
@@ -93,4 +94,13 @@ test('sync', t => {
         path: getDatabasePath(t)
     })
     t.truthy(db<number>('nums').find(123))
+})
+
+test('list', async t => {
+    const db = await connect({
+        path: getDatabasePath(t)
+    })
+
+    const list = db<number>('nums').list()
+    t.deepEqual(list, [ 123, 456, 789 ])
 })

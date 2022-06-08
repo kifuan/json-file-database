@@ -101,6 +101,11 @@ export class Collection<T> {
         return this.elements.find(toCondition(cond))
     }
 
+    list() : T[] {
+        // Deep copy the elements.
+        return JSON.parse(JSON.stringify(this.elements))
+    }
+
     /**
      * The length of this collection.
      */

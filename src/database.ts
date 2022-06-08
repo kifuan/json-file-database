@@ -3,10 +3,17 @@ import { readFile, writeFile } from 'fs/promises'
 import { readFileSync } from 'fs'
 
 /**
- * The database type. It can be called when collection name,
+ * The database type. It can be called with collection name,
  * and return the collection for you to operate.
  */
 export type Database = <T>(name: string) => Collection<T>
+
+/**
+ * The JSON data. It must contain arrays as values,
+ */
+export type JSONData = {
+    [key: string] : any[]
+}
 
 /**
  * The options when creating a connection of database file.
@@ -30,7 +37,7 @@ export type DatabaseOptions = {
      * 
      * It will be an empty object by default.
      */
-    init?: any
+    init?: JSONData
 
     /**
      * After the database file is saved,
@@ -63,7 +70,7 @@ export function connectSync(options: DatabaseOptions) : Database {
     return createDatabase(data, options)
 }
 
-function createDatabase(data: any, options: DatabaseOptions) : Database {
+function createDatabase(data: JSONData, options: DatabaseOptions) : Database {
     const { path, delay, onSaved } = options
 
     // Save the data with the technology of "debouncing".
@@ -86,7 +93,7 @@ function createDatabase(data: any, options: DatabaseOptions) : Database {
     }
 }
 
-async function readDatabaseFile(path: string, init?: any) : Promise<any> {
+async function readDatabaseFile(path: string, init?: JSONData) : Promise<JSONData> {
     try {
         return JSON.parse(await readFile(path, 'utf-8'))
     } catch (err) {
@@ -97,7 +104,7 @@ async function readDatabaseFile(path: string, init?: any) : Promise<any> {
     }
 }
 
-function readDatabaseFileSync(path: string, init?: any) : any {
+function readDatabaseFileSync(path: string, init?: JSONData) : JSONData {
     try {
         return JSON.parse(readFileSync(path, 'utf-8'))
     } catch (err) {

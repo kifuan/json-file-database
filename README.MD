@@ -102,6 +102,17 @@ Here are the documentations.
     | `init`    | `JSONData`                  | `{}`         | If the database file does not exist, it will create a new file with this object in it. |
     | `onSaved` | `(this: undefined) => void` | `undefined`  | After the database file is saved, this function will be called if it is not undefined. |
 
+    ```typescript
+    export type DatabaseOptions = {
+        path: string
+        delay?: number
+        init?: JSONData
+        onSaved?: (this: undefined) => void
+    }
+    ```
+
+    
+
 + `Condition<T>`
 
   The condition used to compare values.

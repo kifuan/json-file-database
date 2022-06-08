@@ -1,17 +1,15 @@
 export type Predicate<T> = (obj: T) => boolean
 
-export type CollectionOptions<T> = {
-    delay: number
+export type CollectionOptions = {
     data: any
     name: string
-    save: () => Promise<void>
+    save: () => void
 }
 
 export class Collection<T> {
-    private readonly options: CollectionOptions<T>
-    private timeout: NodeJS.Timeout | undefined
+    private readonly options: CollectionOptions
 
-    constructor(options: CollectionOptions<T>) {
+    constructor(options: CollectionOptions) {
         this.options = options
 
         // Make sure that the collection will operate an array.
@@ -25,20 +23,13 @@ export class Collection<T> {
         return data[name] ||= []
     }
 
-    private startSaving() {
-        const { save, delay } = this.options
-
-        // Does "function debounce" here.
-        clearTimeout(this.timeout)
-        this.timeout = setTimeout(() => {
-            this.timeout = undefined
-            save()
-        }, delay)
+    private save() : void {
+        this.options.save.apply(undefined)
     }
 
     insert(...data: T[]) : void {
         this.array.push(...data)
-        this.startSaving()
+        this.save()
     }
 
     update(data: T, predicate: Predicate<T>) : boolean {
@@ -47,7 +38,7 @@ export class Collection<T> {
             return false
         }
         this.array[index] = data
-        this.startSaving()
+        this.save()
         return true
     }
 
@@ -57,7 +48,7 @@ export class Collection<T> {
             return false
         }
         this.array.splice(index, 1)
-        this.startSaving()
+        this.save()
         return true
     }
 

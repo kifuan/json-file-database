@@ -36,7 +36,7 @@ export type DatabaseOptions = {
      * After the database file is saved,
      * this function will be called.
      * 
-     * It will be an empty function by default.
+     * It will do nothing after saving if it is undefined.
      */
     onSaved?: () => void
 }
@@ -65,15 +65,18 @@ export function connectSync(options: DatabaseOptions) : Database {
 
 function createDatabase(data: any, options: DatabaseOptions) : Database {
     const { path, delay, onSaved } = options
+    let timeout: NodeJS.Timeout | undefined
 
-    return <T>(name: string) => new Collection<T>({
-        delay: delay || 0,
-        name, data,
-        async save() {
-            await writeFile(path, JSON.stringify(data))
+    function save() {
+        clearTimeout(timeout)
+        timeout = setTimeout(() => {
+            timeout = undefined
+            // writeFile(path, JSON.stringify(data)).then(() => onSaved && onSaved())
             onSaved && onSaved()
-        }
-    })
+        }, delay || 0)
+    }
+
+    return <T>(name: string) => new Collection<T>({ name, data, save })
 }
 
 async function readDatabaseFile(path: string, init?: any) : Promise<any> {

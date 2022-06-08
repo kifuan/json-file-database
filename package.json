@@ -1,7 +1,8 @@
 {
   "name": "json-file-database",
   "version": "1.0.0",
-  "description": "Database by JSON files",
+  "description": "Lightweight Database on NodeJS by JSON files",
+  "keywords": ["lightweight", "node", "database", "json"],
   "main": "dist/",
   "scripts": {
     "test": "tsc && ava"

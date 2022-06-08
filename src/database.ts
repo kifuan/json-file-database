@@ -65,6 +65,7 @@ export function connectSync(options: DatabaseOptions) : Database {
 
 function createDatabase(data: any, options: DatabaseOptions) : Database {
     const { path, delay, onSaved } = options
+
     let timeout: NodeJS.Timeout | undefined
 
     function save() {
@@ -74,8 +75,13 @@ function createDatabase(data: any, options: DatabaseOptions) : Database {
             writeFile(path, JSON.stringify(data)).then(() => onSaved && onSaved())
         }, delay || 0)
     }
-
-    return <T>(name: string) => new Collection<T>({ name, data, save })
+    return <T>(name: string) => {
+        const elements: T[] = data[name] ||= []
+        if (!Array.isArray(elements)) {
+            throw new TypeError(`Property ${name} in the database is not an array.`)
+        }
+        return new Collection<T>({ elements, save })
+    }
 }
 
 async function readDatabaseFile(path: string, init?: any) : Promise<any> {

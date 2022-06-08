@@ -36,8 +36,8 @@ test('init', async t => {
 
     const col = db<number>('nums')
 
-    t.falsy(col.find(n => n === 114))
-    t.truthy(col.find(n => n === 123))
+    t.falsy(col.find(114))
+    t.truthy(col.find(123))
 })
 
 test('no-save', async t => {
@@ -49,7 +49,7 @@ test('no-save', async t => {
             t.fail()
         }
     })
-    t.truthy(db<number>('nums').find(n => n === 123))
+    t.truthy(db<number>('nums').find(123))
 
     t.log('sleep 100ms to make sure the database is not saved.')
     await sleep(100)
@@ -79,15 +79,18 @@ test('update', async t => {
         path: getDatabasePath(t)
     })
     const objs = db<{id: number, name: string}>('objs')
+    const nums = db<number>('nums')
 
     objs.update({ name: 'Liu Zhao' }, obj => obj.id === 123)
-
     t.deepEqual(objs.find(obj => obj.id === 123), { id: 123, name: 'Liu Zhao' })
+
+    nums.update(114514, 123)
+    t.truthy(nums.find(114514))
 })
 
 test('sync', t => {
     const db = connectSync({
         path: getDatabasePath(t)
     })
-    t.truthy(db<number>('nums').find(n => n === 123))
+    t.truthy(db<number>('nums').find(123))
 })

@@ -15,6 +15,13 @@ export type CollectionOptions<T> = {
     save: () => void
 }
 
+function toCondition<T>(cond: Condition<T> | T) : Condition<T> {
+    if (typeof cond !== 'function') {
+        return n => n === cond
+    }
+    return cond as Condition<T>
+}
+
 /**
  * A collection is like an array.
  * You can insert, update, delete and find members in it.
@@ -51,15 +58,13 @@ export class Collection<T> {
      * @param cond the condition to match elements
      * @return whether the data is updated
      */
-    update(data: Partial<T> | T, cond: Condition<T>) : boolean {
-        const index = this.elements.findIndex(cond)
-
+    update(data: Partial<T> | T, cond: Condition<T> | T) : boolean {
+        const index = this.elements.findIndex(toCondition(cond))
         if (index === -1) {
             return false
         }
 
         const found = this.elements[index]
-
         if (found instanceof Object) {
             Object.assign(found, data)
         } else {
@@ -67,7 +72,6 @@ export class Collection<T> {
             // so it must be the type itself.
             this.elements[index] = data as T
         }
-
         this.save()
         return true
     }
@@ -77,8 +81,8 @@ export class Collection<T> {
      * @param cond the condition to match elements
      * @return whether the data is deleted
      */
-    delete(cond: Condition<T>) : boolean {
-        const index = this.elements.findIndex(cond)
+    delete(cond: Condition<T> | T) : boolean {
+        const index = this.elements.findIndex(toCondition(cond))
         if (index === -1) {
             return false
         }
@@ -93,8 +97,8 @@ export class Collection<T> {
      * @param cond the condition to find
      * @returns the data that matches given condition, or undefined if there is not
      */
-    find(cond: Condition<T>) : T | undefined {
-        return this.elements.find(cond)
+    find(cond: Condition<T> | T) : T | undefined {
+        return this.elements.find(toCondition(cond))
     }
 
     /**

@@ -71,8 +71,7 @@ function createDatabase(data: any, options: DatabaseOptions) : Database {
         clearTimeout(timeout)
         timeout = setTimeout(() => {
             timeout = undefined
-            // writeFile(path, JSON.stringify(data)).then(() => onSaved && onSaved())
-            onSaved && onSaved()
+            writeFile(path, JSON.stringify(data)).then(() => onSaved && onSaved())
         }, delay || 0)
     }
 

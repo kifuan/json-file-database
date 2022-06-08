@@ -1,7 +1,7 @@
 import test from 'ava'
 
 import { writeFileSync, unlinkSync } from 'fs'
-import { connect } from '../src'
+import { connect, connectSync } from '../src'
 
 const PATH = 'test/test-db.json'
 
@@ -69,3 +69,9 @@ test('save', async t => {
     t.true(saved)  
 })
 
+test('sync', t => {
+    const db = connectSync({
+        path: PATH
+    })
+    t.truthy(db<number>('nums').find(n => n === 123))
+})

@@ -2,6 +2,17 @@
 
 It's not necessary to use a real database in some small projects, and I often use JSON files as database. However, just using `JSON` and `fs` is very inconvenient, so this project is made.
 
+## Feature
+
+It uses "debouncd" function to save the data. This makes less IO operations.
+
+
+## Todo
+
+Add property `comparator` for `DatabaseOptions`. If it is set, the collection will be AVL-tree based so that it can be more efficient.
+
+If it is not set, it is still working with array-based collection.
+
 ## Usage
 
 First, download it by `npm`(or `yarn`, `pnpm`, etc.).

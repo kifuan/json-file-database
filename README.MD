@@ -121,7 +121,7 @@ Here are the documentations.
   export type Condition<T> = (obj: T) => boolean
   ```
 
-  Luckily, you can pass a value and it will be converted to `n => n === value` as a condition in all functions that use `Condition<T>`.
+  Luckily, you can pass a value and it will be converted to `n => n === value` as `Condition<T>` in all functions that use `Condition<T>`.
 
 + `Collection<T>`
 

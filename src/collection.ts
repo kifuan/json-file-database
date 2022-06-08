@@ -6,7 +6,7 @@ export type Condition<T> = (obj: T) => boolean
 /**
  * The options of creating a collection.
  */
-export type CollectionOptions<T> = {
+type CollectionOptions<T> = {
     /**
      * The elements in array.
      */

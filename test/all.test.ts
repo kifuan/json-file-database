@@ -136,3 +136,17 @@ test('find-and-has', async t => {
     t.true(objs.has(u => u.id === 456 && u.name === 'Si Li'))
     t.true(objs.has(u => u.id === 789 && u.name === 'Wu Wang'))
 })
+
+test('insert', async t => {
+    const db = await connect({
+        path: getDatabasePath(t)
+    })
+
+    const nums = db<number>('nums')
+    
+    t.false(nums.insert(123))
+    t.false(nums.insert(100, n => n < 900))
+
+    t.true(nums.insert(114))
+    t.true(nums.insert(123, n => n < 10)) 
+})

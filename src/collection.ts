@@ -45,12 +45,20 @@ export class Collection<T> {
     }
 
     /**
-     * Inserts given elements to the collection.
-     * @param els the elements to be inserted
+     * Inserts given element to the collection.
+     * @param el the element to be inserted
+     * @param cond the condition to check if the element is already inserted
+     * @return whether the element is inserted
      */
-    insert(...els: T[]) : void {
-        this.elements.push(...els)
+    insert(el: T, cond?: Condition<T>) : boolean {
+        // Tries to use function first, and then use
+        // element itself as the condition.
+        if (this.has(cond || el)) {
+            return false
+        }
+        this.elements.push(el)
         this.save()
+        return true
     }
 
     /**

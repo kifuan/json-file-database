@@ -2,6 +2,11 @@
 
 It's not necessary to use a real database in some small projects, and I often use JSON files as database. However, just using `JSON` and `fs` is very inconvenient, so this project is made.
 
+## Note
+
+**This project is still developing!!!**
+**Incompatible API changes may happen!!!**
+
 ## Feature
 
 It uses "debouncd" function to save the data. This makes less IO operations.
@@ -154,10 +159,14 @@ Here are the documentations.
 
   + Method `insert`
 
-    Inserts given elements to the collection.
+    Inserts given element to the collection.
+
+    + `el`: the element to be inserted
+    + `cond`: the condition to check if the element is already inserted
+    + `return`: whether the element is inserted
 
     ```typescript
-    insert(...els: T[]): void
+    insert(el: T, cond?: Condition<T>) : boolean
     ```
 
   + Method `update`

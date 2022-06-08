@@ -15,7 +15,7 @@ And then use it in your project like this:
 ```typescript
 import { connect } from 'json-file-database'
 
-const db = connect({
+const db = await connect({
     path: './db.json',
     init: { nums: [ 1, 2, 3 ] },
     delay: 1000,

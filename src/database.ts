@@ -1,6 +1,6 @@
 import { Collection } from './collection'
 import { readFile, writeFile } from 'fs/promises'
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync } from 'fs'
 
 /**
  * The database type. It can be called when collection name,

@@ -32,12 +32,21 @@ export class Collection<T> {
         this.save()
     }
 
-    update(data: T, predicate: Predicate<T>) : boolean {
+    update(data: Partial<T> | T, predicate: Predicate<T>) : boolean {
         const index = this.array.findIndex(predicate)
         if (index === -1) {
             return false
         }
-        this.array[index] = data
+        const found = this.array[index]
+
+        if (found instanceof Object) {
+            Object.assign(found, data)
+        } else {
+            // Primitive types have no properties,
+            // so it must be the type itself.
+            this.array[index] = data as T
+        }
+
         this.save()
         return true
     }

@@ -1,9 +1,7 @@
 import test, { ExecutionContext } from 'ava'
 
-import { writeFileSync, unlinkSync } from 'fs'
+import { writeFileSync } from 'fs'
 import { connect, connectSync } from '../src'
-
-const PATH = 'test/test-db.json'
 
 function sleep(delay: number) : Promise<void> {
     return new Promise(resolve => {
@@ -26,7 +24,6 @@ test.beforeEach(t => {
         ]
     }))
     t.log('prepare the database file')
-    t.pass()
 })
 
 test('init', async t => {
@@ -83,7 +80,7 @@ test('update', async t => {
     })
     const objs = db<{id: number, name: string}>('objs')
 
-    objs.update({ id: 123, name: 'Liu Zhao' }, obj => obj.id === 123)
+    objs.update({ name: 'Liu Zhao' }, obj => obj.id === 123)
 
     t.deepEqual(objs.find(obj => obj.id === 123), { id: 123, name: 'Liu Zhao' })
 })

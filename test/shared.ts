@@ -39,5 +39,5 @@ export function getObjs(db: Database, options?: Partial<RequiredCollectionOption
 
 test('shared', t => {
     t.log('This is just the file to share functions.')
-    t.true(true)
+    t.pass()
 })

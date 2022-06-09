@@ -51,9 +51,11 @@ export class ArrayCollection<T extends object, P extends keyof T> implements Col
         return true
     }
 
-    removeAll(cond: Condition<T>): void {
-        this.#elements = this.#elements.filter(el => !cond(el))
-        this.save()
+    removeAll(cond: Condition<T>): number {
+        const elements = this.findAll(cond)
+        const length = elements.length
+        elements.forEach(el => this.remove(el))
+        return length
     }
 
     has(el: Pick<T, P>): boolean

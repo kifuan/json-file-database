@@ -24,43 +24,62 @@ And then use it in your project like this:
 ```typescript
 import { connect } from 'json-file-database'
 
+type User = { id: number, name: string }
+
+// Connect the database. If there is not the file yet,
+// it will create one after running this program.
 const db = connect({
-    path: './db.json',
-    init: { nums: [ 1, 2, 3 ] },
-    delay: 1000,
-    onSaved() {
-        console.log('The database is saved!')
+    file: './db.json',
+    init: {
+        users: [
+            { id: 1, name: 'San Zhang' },
+            { id: 2, name: 'Si Li' },
+            { id: 3, name: 'Wu Wang' },
+        ]
     }
 })
 
-const nums = db<number>('nums')
+// Specify the type of elements is User,
+// and the prime key is id.
+const users = db<User, 'id'>({
+    name: 'users',
+    comparator: (u1, u2) => u1.id - u2.id
+})
 
-// Insert 6 to the collection.
-nums.insert(6)
+// Find the user with prime key id.
+console.log('The user whose id is 1:', users.find({ id: 1 }))
 
-// Replace 2 with 123.
-nums.update(123, 2)
 
-// Delete element 1.
-nums.delete(1)
+// Find all users with given condition.
+console.log('All users whose id <= 2 are:', users.findAll(u => u.id <= 2))
 
-// Find elements that is smaller than 5.
-// It will be 3.
-console.log(nums.find(n => n < 5))
 
-// Finds all elements that is bigger than 5
-// It will be [ 123, 6 ]
-console.log(nums.findAll(n => n > 5))
+// Check whether the collection has it.
+console.log('Whether the collection has a user whose id is 5:', users.has({ id: 5 }))
 
-// Check whether 123 is in the collection.
-// It is true because we've updated 2 with 123.
-console.log(nums.has(123))
 
-// List the collection. It is [ 123, 3, 6 ].
-console.log(nums.list())
+// Insert the user and return if it is succeeded.
+console.log('Insert a user whose id is 2:', users.insert({ id: 2, name: 'Liu Zhao' }))
 
-// Gets the length of this collection. It is 3.
-console.log(nums.length)
+
+// List all users.
+console.log('All users are:', users.list())
+
+// Get the number of users.
+console.log('The number of users is:', users.length)
+
+
+// Remove the user whose id is 1, and check whether it has removed the user.
+console.log('Remove the user whose id is 1:', users.remove({ id: 1 }))
+
+
+// Remove all users that match the condition, and return the number of them.
+console.log('Remove all users whose id < 3, the number of them is:',
+        users.removeAll(u => u.id < 3)) 
+
+
+// Update the user with prime key, and return whether it has updated the user.
+console.log('Update the user whose id is 3:', users.update({ id: 3, name: 'Liu Zhao' }))
 ```
 
 At the first time you run, it will create a new file `db.json` and all outputs are expected. However, when you try to run it again, the outputs are not the same.

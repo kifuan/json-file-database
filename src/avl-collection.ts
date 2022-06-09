@@ -234,8 +234,11 @@ export class AVLCollection<T extends object, P extends keyof T> implements Colle
         return result
     }
 
-    removeAll(cond: Condition<T>): void {
-        this.findAll(cond).forEach(el => this.remove(el))
+    removeAll(cond: Condition<T>): number {
+        const elements = this.findAll(cond)
+        const length = elements.length
+        elements.forEach(el => this.remove(el))
+        return length
     }
 
     has(el: Pick<T, P>): boolean

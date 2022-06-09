@@ -71,8 +71,9 @@ export interface Collection<T extends object, P extends keyof T> {
     /**
      * Removes all elements that match the condition.
      * @param cond the condition to match the element to be removed.
+     * @returns the number of elements it has removed.
      */
-    removeAll(cond: Condition<T>) : void
+    removeAll(cond: Condition<T>) : number
 
     /**
      * Checks whether the element is in this collection.

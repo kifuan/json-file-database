@@ -20,7 +20,7 @@ export const OBJS_ARRAY = [
     { id: 789, name: 'Wu Wang' }
 ]
 
-export function connectDatabase(t: ExecutionContext<any>, options?: Partial<DatabaseOptions>) {
+export function connectDatabase(options?: Partial<DatabaseOptions>) {
     options ||= {}
     return connect({
         file: createObjectFile({ objs: OBJS_ARRAY }),

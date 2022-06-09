@@ -1,8 +1,8 @@
 import test from 'ava'
 import { connectDatabase, getObjs, OBJS_ARRAY } from './shared'
 
-test('array-update', t => {
-    const db = connectDatabase(t)
+test('update', t => {
+    const db = connectDatabase()
     
     const objs = getObjs(db)
 
@@ -10,14 +10,14 @@ test('array-update', t => {
     t.deepEqual(objs.find({ id: 123 }), { id: 123, name: 'Liu Zhao' })
 })
 
-test('array-list', t => {
-    const db = connectDatabase(t)
+test('list', t => {
+    const db = connectDatabase()
     const objs = getObjs(db)
     t.deepEqual(objs.list(), OBJS_ARRAY)
 })
 
-test('array-find-and-has', t => {
-    const db = connectDatabase(t)
+test('find-and-has', t => {
+    const db = connectDatabase()
     const objs = getObjs(db)
 
     t.true(objs.has({ id: 123 }))
@@ -27,12 +27,12 @@ test('array-find-and-has', t => {
     t.false(objs.has(u => u.id === 114514))
 })
 
-test('array-insert', t => {
-    const db = connectDatabase(t)
+test('insert', t => {
+    const db = connectDatabase()
     const objs = getObjs(db)
     
     t.true(objs.insert({ id: 114514, name: 'Koji Tadokoro' }))
     t.false(objs.insert({ id: 114514, name: 'Koji Tadokoro' }))
 })
 
-test.todo('array-remove')
+test.todo('remove')

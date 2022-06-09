@@ -1,8 +1,8 @@
 import test from 'ava'
 import { connectDatabase, getObjs, OBJS_ARRAY } from './shared'
 
-test('avl-insert', t => {
-    const db = connectDatabase(t)
+test('insert', t => {
+    const db = connectDatabase()
     const objs = getObjs(db, { type: 'avl' })
 
     t.false(objs.insert({ id: 123, name: 'Liu Zhao' }))
@@ -12,23 +12,23 @@ test('avl-insert', t => {
     t.false(objs.insert({ id: 114514, name: 'Koji Tadokoro' }))
 })
 
-test('avl-list', t => {
-    const db = connectDatabase(t)
+test('list', t => {
+    const db = connectDatabase()
     const objs = getObjs(db, { type: 'avl' })
     
     t.deepEqual(objs.list(), OBJS_ARRAY)
 })
 
-test('avl-update', t => {
-    const db = connectDatabase(t)
+test('update', t => {
+    const db = connectDatabase()
     const objs = getObjs(db, { type: 'avl' })
 
     t.true(objs.update({ id: 123, name: 'Koji Tadokoro' }))
     t.deepEqual(objs.find({ id: 123 }), { id: 123, name: 'Koji Tadokoro' })
 })
 
-test('avl-find-and-has', t => {
-    const db = connectDatabase(t)
+test('find-and-has', t => {
+    const db = connectDatabase()
     const objs = getObjs(db, { type: 'avl' })
 
     t.deepEqual(objs.find({ id: 123 }), { id: 123, name: 'San Zhang' })
@@ -38,4 +38,4 @@ test('avl-find-and-has', t => {
 })
 
 
-test.todo('avl-remove')
+test.todo('remove')

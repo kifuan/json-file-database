@@ -2,7 +2,7 @@ import test from 'ava'
 import { connectDatabase, getObjs, sleep } from './shared'
 
 test('db-init', t => {
-    const db = connectDatabase(t, {
+    const db = connectDatabase({
         init: {
             objs: [ { id: 114514, name: 'Koji Tadokoro' } ]
         }
@@ -14,9 +14,9 @@ test('db-init', t => {
     t.false(objs.has(o => o.id === 114514))
 })
 
-test('db-no-save', async t => {
+test('no-save', async t => {
     let notSaved = true
-    const db = connectDatabase(t, {
+    const db = connectDatabase({
         onSaved() {
             notSaved = false
         }
@@ -32,9 +32,9 @@ test('db-no-save', async t => {
     t.true(notSaved)
 })
 
-test('db-save', async t => {
+test('save', async t => {
     let saved = false
-    const db = connectDatabase(t, {
+    const db = connectDatabase({
         onSaved() {
             saved = true
         }

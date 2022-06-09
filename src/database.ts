@@ -8,7 +8,7 @@ import { createFile, DatabaseFile } from './database-file'
  * @template T the type of elements.
  * @template P the prime key of the type.
  */
-export type RequiredCollectionOptions<T extends object, P extends keyof T> = {
+export type CollectionOptions<T extends object, P extends keyof T> = {
     /**
      * The name of the collection.
      */
@@ -32,8 +32,9 @@ export type RequiredCollectionOptions<T extends object, P extends keyof T> = {
  * @template P the prime key of the type.
  * @param options the options to create the collection.
  */
-export type Database = <T extends object, P extends keyof T>
-    (options: RequiredCollectionOptions<T, P>) => Collection<T, P>
+export interface Database {
+    <T extends object, P extends keyof T>(options: CollectionOptions<T, P>) : Collection<T, P>
+}
 
 /**
  * What the Database will operate. It must contain array-typed values.
@@ -102,7 +103,7 @@ export function connect(options: DatabaseOptions) : Database {
         }, delay)
     }
 
-    return <T extends object, P extends keyof T>(options: RequiredCollectionOptions<T, P>) => {
+    return <T extends object, P extends keyof T>(options: CollectionOptions<T, P>) => {
         let { name, comparator, type } = options
         type ||= 'array'
 

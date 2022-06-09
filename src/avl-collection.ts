@@ -1,4 +1,4 @@
-import { Collection, Condition, Comparator, CollectionOptions, Save } from './collection'
+import { Collection, Condition, Comparator, InternalCollectionOptions, Save } from './collection'
 
 type Node<T> = {
     val: T
@@ -206,7 +206,7 @@ export class AVLCollection<T extends object, P extends keyof T> implements Colle
         this.save(this.name, () => this.list())
     }
 
-    constructor(options: CollectionOptions<T, P>) {
+    constructor(options: InternalCollectionOptions<T, P>) {
         this.save = options.save
         this.name = options.name
         this.tree = new AVLTree<T, P>(options.comparator)

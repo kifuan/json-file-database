@@ -1,4 +1,4 @@
-import { Collection, CollectionOptions, Comparator, Condition, Save } from './collection'
+import { Collection, InternalCollectionOptions, Comparator, Condition, Save } from './collection'
 
 export class ArrayCollection<T extends object, P extends keyof T> implements Collection<T, P> {
     private readonly comparator: Comparator<T, P>
@@ -6,7 +6,7 @@ export class ArrayCollection<T extends object, P extends keyof T> implements Col
     private readonly elements: T[]
     private readonly save: Save<T>
 
-    constructor(options: CollectionOptions<T, P>) {
+    constructor(options: InternalCollectionOptions<T, P>) {
         this.comparator = options.comparator
         this.save = options.save
         this.name = options.name

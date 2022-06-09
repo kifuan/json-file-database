@@ -1,4 +1,4 @@
-import { connect, createObjectFile, Database, DatabaseOptions, RequiredCollectionOptions } from '../src'
+import { connect, createObjectFile, Database, DatabaseOptions, CollectionOptions } from '../src'
 
 export function sleep(delay: number) : Promise<void> {
     return new Promise(resolve => {
@@ -27,7 +27,7 @@ export function connectDatabase(options?: Partial<DatabaseOptions>) {
     })
 }
 
-export function getObjs(db: Database, options?: Partial<RequiredCollectionOptions<Obj, 'id'>>) {
+export function getObjs(db: Database, options?: Partial<CollectionOptions<Obj, 'id'>>) {
     options ||= {}
     return db<Obj, 'id'>({
         name: 'objs',

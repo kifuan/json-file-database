@@ -2,10 +2,9 @@
 
 It's not necessary to use a real database in some small projects, and I often use JSON files as database. However, just using `JSON` and `fs` is very inconvenient, so this project is made.
 
-## Note
+## Documentations
 
-**This project is still developing!!!**
-**Incompatible API changes may happen!!!**
+Click [here](https://kifuan.github.io/json-file-database/modules.html).
 
 ## Feature
 

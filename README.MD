@@ -4,11 +4,13 @@ It's not necessary to use a real database in some small projects, and I often us
 
 ## Documentations
 
-Click [here](https://kifuan.github.io/json-file-database/modules.html).
+Click [here](https://kifuan.github.io/json-file-database/).
 
 ## Feature
 
-It uses "debouncd" function to save the data. This makes less IO operations.
++ It uses "debouncd" function to save the data. This makes less IO operations.
+
++ It uses binary-search(for collection typed `array`) or AVL-tree(for collection typed `avl`) to maintain the data. This means their time complexity would be `O(log n)`.
 
 ## Usage
 

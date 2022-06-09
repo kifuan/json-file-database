@@ -1,11 +1,10 @@
 import test from 'ava'
 import { connect, createObjectFile } from '../src'
-import { connectDatabase, getObjs, OBJS_ARRAY } from './shared'
+import { connectDatabase, Obj, OBJS_ARRAY } from './shared'
 
 test('update', t => {
     const db = connectDatabase()
-    
-    const objs = getObjs(db)
+    const objs = db<Obj>('objs')
 
     objs.update({ id: 123, name: 'Liu Zhao' })
     t.deepEqual(objs.find({ id: 123 }), { id: 123, name: 'Liu Zhao' })
@@ -13,13 +12,13 @@ test('update', t => {
 
 test('list', t => {
     const db = connectDatabase()
-    const objs = getObjs(db)
+    const objs = db<Obj>('objs')
     t.deepEqual(Array.from(objs), OBJS_ARRAY)
 })
 
 test('find-and-has', t => {
     const db = connectDatabase()
-    const objs = getObjs(db)
+    const objs = db<Obj>('objs')
 
     t.true(objs.has({ id: 123 }))
     t.true(objs.has(u => u.id === 123 && u.name === 'San Zhang'))
@@ -30,7 +29,7 @@ test('find-and-has', t => {
 
 test('insert', t => {
     const db = connectDatabase()
-    const objs = getObjs(db)
+    const objs = db<Obj>('objs')
     
     t.true(objs.insert({ id: 114514, name: 'Koji Tadokoro' }))
     t.false(objs.insert({ id: 114514, name: 'Koji Tadokoro' }))
@@ -38,7 +37,7 @@ test('insert', t => {
 
 test('remove', t => {
     const db = connectDatabase()
-    const objs = getObjs(db)
+    const objs = db<Obj>('objs')
 
     t.true(objs.remove({ id: 123 }))
     t.false(objs.remove({ id: 123 }))
@@ -57,12 +56,12 @@ test('sort', t => {
     })
     const nums = db<{ val: number }, 'val'>({
         name: 'nums',
-        comparator: (first, second) => first.val - second.val
+        comparator: (first, second) => second.val - first.val
     })
 
     insertArr.forEach(i => nums.insert({ val: i }))
 
-    const expected = numsArr.concat(insertArr).sort((a, b) => a - b)
+    const expected = numsArr.concat(insertArr).sort((a, b) => b - a)
     const actual = Array.from(nums).map(n => n.val)
     t.deepEqual(actual, expected)
 })

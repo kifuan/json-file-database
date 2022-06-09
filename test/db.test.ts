@@ -1,5 +1,5 @@
 import test from 'ava'
-import { connectDatabase, getObjs, sleep } from './shared'
+import { connectDatabase, Obj, sleep } from './shared'
 
 test('db-init', t => {
     const db = connectDatabase({
@@ -8,7 +8,7 @@ test('db-init', t => {
         }
     })
 
-    const objs = getObjs(db)
+    const objs = db<Obj>('objs')
 
     t.true(objs.has(o => o.id === 123))
     t.false(objs.has(o => o.id === 114514))
@@ -22,7 +22,7 @@ test('no-save', async t => {
         }
     })
 
-    const objs = getObjs(db)
+    const objs = db<Obj>('objs')
 
     t.true(objs.has({ id: 123 }))
 
@@ -40,7 +40,7 @@ test('save', async t => {
         }
     })
 
-    const objs = getObjs(db)
+    const objs = db<Obj>('objs')
 
     objs.insert({ id: 114514, name: 'Koji Tadokoro' })
 

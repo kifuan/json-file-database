@@ -7,124 +7,175 @@ type Node<T> = {
     right?: Node<T>
 }
 
-export class AVLCollection<T extends object, P extends keyof T> implements Collection<T, P> {
-    private nodeHeight(node: Node<T> | undefined) {
+class AVLTree<T extends object, P extends keyof T> {
+    private root: Node<T> | undefined
+    private comparator: Comparator<T, P>
+
+    constructor(comparator: Comparator<T, P>) {
+        this.comparator = comparator
+    }
+
+    find(val: Pick<T, P>) : T | undefined {
+        return this.pFind(this.root, val)?.val
+    }
+
+    remove(val: Pick<T, P>) {
+        const { node, removed } = this.pRemove(this.root, val)
+        this.root = node
+        return removed
+    }
+
+    insert(val: T) {
+        const { node, inserted } = this.pInsert(this.root, val)
+        this.root = node
+        return inserted
+    }
+
+    list() : T[] {
+        const result = [] as T[]
+        this.pList(result, this.root)
+        return result
+    }
+
+    get count() : number {
+        return this.pCount(this.root)
+    }
+
+    private pList(result: T[], node: Node<T> | undefined) {
+        if (node === undefined) {
+            return
+        }
+        this.pList(result, node.left)
+        result.push(node.val)
+        this.pList(result, node.right)
+    }
+
+    private pCount(node: Node<T> | undefined) : number {
+        if (node === undefined) {
+            return 0
+        }
+        return this.pCount(node.left) + this.pCount(node.right) + 1
+    }
+
+
+    private height(node: Node<T> | undefined) {
         return node ? node.height : -1
     }
 
-    private nodeCalcHeight(node: Node<T>) : number {
-        return Math.max(this.nodeHeight(node.left), this.nodeHeight(node.right)) + 1
+    private calcHeight(node: Node<T>) : number {
+        return Math.max(this.height(node.left), this.height(node.right)) + 1
     }
 
-    private nodeRotateWithLeftChild(k1: Node<T>) : Node<T> {
+    private rotateLL(k1: Node<T>) : Node<T> {
         const k2 = k1.left!
-        k1.left = k2.right
+        
         k2.right = k1
+        k1.left = k2.right
 
-        k1.height = this.nodeCalcHeight(k1)
-        k2.height = this.nodeCalcHeight(k2)
+        k1.height = this.calcHeight(k1)
+        k2.height = this.calcHeight(k2)
 
         return k2
     }
 
-    private nodeRotateWithRightChild(k1: Node<T>) : Node<T> {
+    private rotateRR(k1: Node<T>) : Node<T> {
         const k2 = k1.right!
         k1.right = k2.left
         k2.left = k1
 
-        k1.height = this.nodeCalcHeight(k1)
-        k2.height = this.nodeCalcHeight(k2)
+        k1.height = this.calcHeight(k1)
+        k2.height = this.calcHeight(k2)
 
         return k2
     }
 
-    private nodeDoubleRotateLeft(k3: Node<T>) : Node<T> {
-        k3.left = this.nodeRotateWithRightChild(k3.left!)
-        return this.nodeRotateWithLeftChild(k3)
+    private rotateLR(k3: Node<T>) : Node<T> {
+        k3.left = this.rotateRR(k3.left!)
+        return this.rotateLL(k3)
     }
 
-    private nodeDoubleRotateRight(k3: Node<T>) : Node<T> {
-        k3.right = this.nodeRotateWithLeftChild(k3.right!)
-        return this.nodeRotateWithRightChild(k3)
+    private rotateRL(k3: Node<T>) : Node<T> {
+        k3.right = this.rotateLL(k3.right!)
+        return this.rotateRR(k3)
     }
 
-    private nodeFactor(node: Node<T>) : number {
-        return this.nodeHeight(node.left) - this.nodeHeight(node.right)
+    private factor(node: Node<T>) : number {
+        return this.height(node.left) - this.height(node.right)
     }
 
-    private nodeBalance(node: Node<T>) : Node<T> {
-        if (this.nodeFactor(node) > 1) {
+    private balance(node: Node<T>) : Node<T> {
+        if (this.factor(node) > 1) {
             // Left is higher.
-            if (this.nodeFactor(node.left!) < 0) {
-                node = this.nodeDoubleRotateLeft(node)
+            if (this.factor(node.left!) < 0) {
+                node = this.rotateLR(node)
             } else {
-                node = this.nodeRotateWithLeftChild(node)
+                node = this.rotateLL(node)
             }
-        } else if (this.nodeFactor(node) < -1) {
+        } else if (this.factor(node) < -1) {
             // Right is higher.
-            if (this.nodeFactor(node.right!) > 0) {
-                node = this.nodeDoubleRotateRight(node)
+            if (this.factor(node.right!) > 0) {
+                node = this.rotateRL(node)
             } else {
-                node = this.nodeRotateWithRightChild(node)
+                node = this.rotateRR(node)
             }
         }
 
         // Anyway, reset the height.
-        node.height = this.nodeCalcHeight(node)
+        node.height = this.calcHeight(node)
         return node
-     }
+    }
 
-    private nodeInsert(node: Node<T> | undefined, val: T) : { node: Node<T>, inserted: boolean } {
+    private pInsert(node: Node<T> | undefined, val: T) : { node: Node<T>, inserted: boolean } {
         if (node === undefined) {
             return { node: { val, height: 0 }, inserted: true }
         }
 
         let inserted = false
-        const cmp = this.#comparator(val, node.val)
+        const cmp = this.comparator(val, node.val)
 
         if (cmp < 0) {
-            const result = this.nodeInsert(node.left, val)
+            const result = this.pInsert(node.left, val)
             node.left = result.node
             inserted = result.inserted
         } else if (cmp > 0) {
-            const result = this.nodeInsert(node.right, val)
+            const result = this.pInsert(node.right, val)
             node.right = result.node
             inserted = result.inserted
         }
-        node = this.nodeBalance(node)
+        node = this.balance(node)
         return { node, inserted }
     }
-    
-    private nodeFind(node: Node<T> | undefined, val: Pick<T, P>) : Node<T> | undefined {
+
+    private pFind(node: Node<T> | undefined, val: Pick<T, P>) : Node<T> | undefined {
         if (node === undefined) {
             return undefined
         }
 
-        const cmp = this.#comparator(val, node.val)
+        const cmp = this.comparator(val, node.val)
 
         if (cmp < 0) {
-            return this.nodeFind(node.left, val)
+            return this.pFind(node.left, val)
         } else if (cmp > 0) {
-            return this.nodeFind(node.right, val)
+            return this.pFind(node.right, val)
         }
 
         return node
     }
 
-    private nodeReomve(node: Node<T> | undefined, val: Pick<T, P>) : { node: Node<T> | undefined, removed: boolean } {
+    private pRemove(node: Node<T> | undefined, val: Pick<T, P>) : { node: Node<T> | undefined, removed: boolean } {
         if (node === undefined) {
             return { node, removed: false }
         }
 
-        const cmp = this.#comparator(val, node.val)
+        const cmp = this.comparator(val, node.val)
         let removed = false
 
         if (cmp < 0) {
-            const result = this.nodeReomve(node.left, val)
+            const result = this.pRemove(node.left, val)
             node.left = result.node
             removed = result.removed
         } else if (cmp > 0) {
-            const result = this.nodeReomve(node.right, val)
+            const result = this.pRemove(node.right, val)
             node.right = result.node
             removed = result.removed
         } else if (node.left !== undefined && node.right !== undefined) {
@@ -134,58 +185,53 @@ export class AVLCollection<T extends object, P extends keyof T> implements Colle
             }
             node.val = min.val
             removed = true
-            node.right = this.nodeReomve(node.right, node.val).node
+            node.right = this.pRemove(node.right, node.val).node
         } else {
             node = node.left || node.right
             removed = true
         }
 
-        node = node === undefined ? node : this.nodeBalance(node)
+        node = node === undefined ? node : this.balance(node)
         return { node, removed }
     }
+}
+
+export class AVLCollection<T extends object, P extends keyof T> implements Collection<T, P> {
+    #name: string
+    #save: Save<T>
+    #tree: AVLTree<T, P>
 
     private save() {
         this.#save(this.#name, () => this.list())
     }
 
-    #comparator: Comparator<T, P>
-    #name: string
-    #save: Save<T>
-    #root: Node<T> | undefined
-
     constructor(options: CollectionOptions<T, P>) {
-        this.#comparator = options.comparator
         this.#save = options.save
         this.#name = options.name
-        options.elements.forEach(el => this.insert(el))
+        this.#tree = new AVLTree<T, P>(options.comparator)
+        options.elements.forEach(el => this.#tree.insert(el))
     }
 
     insert(el: T): boolean {
-        const result = this.nodeInsert(this.#root, el)
-        this.#root = result.node
-        if (result.inserted) {
-            this.save()
-        }
-        return result.inserted
+        const result = this.#tree.insert(el)
+        result && this.save()
+        return result
     }
 
     update(el: Partial<T> & Pick<T, P>): boolean {
-        const node = this.nodeFind(this.#root, el)
-        if (node === undefined) {
+        const obj = this.find(el)
+        if (obj === undefined) {
             return false
         }
-        Object.assign(node.val, el)
+        Object.assign(obj, el)
         this.save()
         return true
     }
 
     remove(el: Pick<T, P>): boolean {
-        const result = this.nodeReomve(this.#root, el)
-        this.#root = result.node
-        if (result.removed) {
-            this.save()
-        }
-        return result.removed
+        const result = this.#tree.remove(el)
+        result && this.save()
+        return result
     }
 
     removeAll(cond: Condition<T>): void {
@@ -202,38 +248,18 @@ export class AVLCollection<T extends object, P extends keyof T> implements Colle
     }
 
     find(el: Pick<T, P>): Readonly<T> | undefined {
-        return this.nodeFind(this.#root, el)?.val
+        return this.#tree.find(el)
     }
 
     findAll(cond: Condition<T>): readonly T[] {
         return this.list().filter(cond)
     }
 
-
-    private listNodes(res: T[], node: Node<T> | undefined) {
-        if (node === undefined) {
-            return
-        }
-        // Inorder iterate this tree.
-        this.listNodes(res, node.left)
-        res.push(node.val)
-        this.listNodes(res, node.right)
-    }
-
     list(): readonly T[] {
-        const result = [] as T[]
-        this.listNodes(result, this.#root)
-        return result
-    }
-
-    private count(node?: Node<T>) : number {
-        if (node === undefined) {
-            return 0
-        }
-        return this.count(node.left) + this.count(node.right) + 1
+        return this.#tree.list()
     }
 
     get length(): number {
-        return this.count(this.#root)
+        return this.#tree.count
     }
 }

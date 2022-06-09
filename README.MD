@@ -64,10 +64,8 @@ console.log('Insert a user whose id is 2:', users.insert({ id: 2, name: 'Liu Zha
 
 
 // List all users.
-console.log('All users are:', users.list())
-
-// Get the number of users.
-console.log('The number of users is:', users.length)
+// You can also use [...users], as it implemented Iterable.
+console.log('All users are:', Array.from(users))
 
 
 // Remove the user whose id is 1, and check whether it has removed the user.

@@ -1,5 +1,6 @@
 import test from 'ava'
 import { connectDatabase, Obj, sleep } from './shared'
+import { connect, createObjectFile } from '../src'
 
 test('db-init', t => {
     const db = connectDatabase({
@@ -48,4 +49,38 @@ test('save', async t => {
     await sleep(50)
 
     t.true(saved)
+})
+
+test('example', t => {
+    t.log('Testing the example code in README.MD')
+
+    type User = { id: number, name: string }
+
+    const usersArr = [
+        { id: 1, name: 'San Zhang' },
+        { id: 2, name: 'Si Li' },
+        { id: 3, name: 'Wu Wang' },
+    ]
+
+    const db = connect({
+        file: createObjectFile({ users: usersArr })
+    })
+
+    const users = db<User>('users')
+
+    t.deepEqual(users.find({ id: 1 }), { id: 1, name: 'San Zhang' })
+
+    t.deepEqual(users.findAll(u => u.id <= 2), usersArr.filter(u => u.id <= 2))
+
+    t.false(users.has({ id: 5 }))
+
+    t.false(users.insert({ id: 2, name: 'Liu Zhao' }))
+
+    t.deepEqual(Array.from(users), usersArr)
+
+    t.true(users.remove({ id: 1 }))
+
+    t.deepEqual(users.removeAll(u => u.id <= 2), 1)
+
+    t.true(users.update({ id: 3, name: 'Liu Zhao' }))
 })

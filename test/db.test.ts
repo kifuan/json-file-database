@@ -1,13 +1,5 @@
 import test from 'ava'
-import { prepareDatabase, cleanDatabase, connectDatabase, getObjs, sleep } from './shared'
-
-test.beforeEach(t => {
-    prepareDatabase(t)
-})
-
-test.after(t => {
-    cleanDatabase(t)
-})
+import { connectDatabase, getObjs, sleep } from './shared'
 
 test('db-init', t => {
     const db = connectDatabase(t, {

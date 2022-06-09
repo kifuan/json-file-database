@@ -1,13 +1,5 @@
 import test from 'ava'
-import { cleanDatabase, connectDatabase, getObjs, OBJS_ARRAY, prepareDatabase } from './shared'
-
-test.beforeEach(t => {
-    prepareDatabase(t)
-})
-
-test.after(t => {
-    cleanDatabase(t)
-})
+import { connectDatabase, getObjs, OBJS_ARRAY } from './shared'
 
 test('array-update', t => {
     const db = connectDatabase(t)

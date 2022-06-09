@@ -2,6 +2,7 @@ import { Collection, CollectionOptions } from './collection'
 import { readFileSync, writeFileSync } from 'fs'
 import { ArrayCollection } from './array-collection'
 import { AVLCollection } from './avl-collection'
+import { createFile, DatabaseFile } from './database-file'
 
 /**
  * Required collection options for user.
@@ -33,9 +34,10 @@ export type JSONData = {
  */
 export type DatabaseOptions = {
     /**
-     * The path of database file.
+     * The file to process.
+     * If it is a string, it will be seen as a path to the file.
      */
-    path: string
+    file: string | DatabaseFile
 
     /**
      * The delay of each saving action.
@@ -65,8 +67,14 @@ export type DatabaseOptions = {
  * @returns the database
  */
 export function connect(options: DatabaseOptions) : Database {
-    const { path, delay, onSaved, init } = options
-    const data = readDatabaseFile(path, init)
+    let { file, delay, onSaved, init } = options
+
+    if (typeof file === 'string') {
+        file = createFile(file)
+    }
+    delay ||= 0
+    
+    const data = readDatabaseFile(file, init)
 
     // Save the data with the technology of "debouncing".
     let timeout: NodeJS.Timeout | undefined
@@ -75,9 +83,10 @@ export function connect(options: DatabaseOptions) : Database {
         timeout = setTimeout(() => {
             timeout = undefined
             data[name] = elements()
-            writeFileSync(path, JSON.stringify(data))
+            const f = file as unknown as DatabaseFile
+            f.write(JSON.stringify(data))
             onSaved?.apply(undefined)
-        }, delay || 0)
+        }, delay)
     }
 
     return <T extends object, P extends keyof T>(options: RequiredCollectionOptions<T, P>) => {
@@ -102,9 +111,9 @@ export function connect(options: DatabaseOptions) : Database {
     }
 }
 
-function readDatabaseFile(path: string, init?: JSONData) : JSONData {
+function readDatabaseFile(file: DatabaseFile, init?: JSONData) : JSONData {
     try {
-        return JSON.parse(readFileSync(path, 'utf-8'))
+        return JSON.parse(file.read())
     } catch (err) {
         if (!init) {
             throw err

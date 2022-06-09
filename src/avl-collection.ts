@@ -7,12 +7,32 @@ type Node<T> = {
     right?: Node<T>
 }
 
-class AVLTree<T extends object, P extends keyof T> {
+class AVLTree<T extends object, P extends keyof T> implements Iterable<T> {
     private root: Node<T> | undefined
     private comparator: Comparator<T, P>
 
     constructor(comparator: Comparator<T, P>) {
         this.comparator = comparator
+    }
+
+    *[Symbol.iterator]() : Iterator<T> {
+        // Inorder iteration
+        if (this.root === undefined) {
+            return
+        }
+
+        const stack : Node<T>[] = []
+        let cur: Node<T> | undefined = this.root
+
+        while (stack.length !== 0 || cur !== undefined) {
+            while (cur) {
+                stack.push(cur)
+                cur = cur.left
+            }
+            const n = stack.pop()!
+            yield n.val
+            cur = n.right
+        }
     }
 
     find(val: Pick<T, P>) : T | undefined {
@@ -30,33 +50,6 @@ class AVLTree<T extends object, P extends keyof T> {
         this.root = node
         return inserted
     }
-
-    list() : T[] {
-        const result = [] as T[]
-        this.pList(result, this.root)
-        return result
-    }
-
-    get count() : number {
-        return this.pCount(this.root)
-    }
-
-    private pList(result: T[], node: Node<T> | undefined) {
-        if (node === undefined) {
-            return
-        }
-        this.pList(result, node.left)
-        result.push(node.val)
-        this.pList(result, node.right)
-    }
-
-    private pCount(node: Node<T> | undefined) : number {
-        if (node === undefined) {
-            return 0
-        }
-        return this.pCount(node.left) + this.pCount(node.right) + 1
-    }
-
 
     private height(node: Node<T> | undefined) {
         return node ? node.height : -1
@@ -203,7 +196,7 @@ export default class AVLCollection<T extends object, P extends keyof T> implemen
     private readonly tree: AVLTree<T, P>
 
     private startSaving() {
-        this.save(this.name, () => this.list())
+        this.save(this.name, () => Array.from(this))
     }
 
     constructor(options: InternalCollectionOptions<T, P>) {
@@ -211,6 +204,10 @@ export default class AVLCollection<T extends object, P extends keyof T> implemen
         this.name = options.name
         this.tree = new AVLTree<T, P>(options.comparator)
         options.elements.forEach(el => this.tree.insert(el))
+    }
+
+    [Symbol.iterator](): Iterator<T> {
+        return this.tree[Symbol.iterator]()
     }
 
     insert(el: T): boolean {
@@ -256,14 +253,14 @@ export default class AVLCollection<T extends object, P extends keyof T> implemen
     }
 
     findAll(cond: Condition<T>): readonly T[] {
-        return this.list().filter(cond)
-    }
+        const result: T[] = []
 
-    list(): readonly T[] {
-        return this.tree.list()
-    }
+        for (const el of this) {
+            if (cond(el)) {
+                result.push(el)
+            }
+        }
 
-    get length(): number {
-        return this.tree.count
+        return result
     }
 }

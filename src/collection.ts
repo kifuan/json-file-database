@@ -48,10 +48,14 @@ export interface InternalCollectionOptions<T extends object, P extends keyof T> 
  * If you called methods that affect the collection,
  * it will start a so-called "debounced" function to save the data.
  * 
+ * Besides, you can also use `Array.from(collection)`, `[...collection]`,
+ * or `for (const element of collection)` if you want, as it implemented
+ * the Iterable<T>.
+ * 
  * @template T the type of element.
  * @template P the prime key for element type.
  */
-export interface Collection<T extends object, P extends keyof T> {
+export interface Collection<T extends object, P extends keyof T> extends Iterable<T> {
     /**
      * Inserts the element to the collection.
      * @param el the element to be inserted.
@@ -107,16 +111,4 @@ export interface Collection<T extends object, P extends keyof T> {
      * @returns all elements that match given condition.
      */
     findAll(cond: Condition<T>) : readonly T[]
-
-    /**
-     * List all elements.
-     * @returns all elements in this collection.
-     */
-    list() : readonly T[]
-
-    /**
-     * Gets the length of this collection.
-     * @returns the length of this collection.
-     */
-    get length() : number
 }

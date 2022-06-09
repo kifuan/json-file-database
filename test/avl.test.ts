@@ -16,7 +16,7 @@ test('list', t => {
     const db = connectDatabase()
     const objs = getObjs(db, { type: 'avl' })
     
-    t.deepEqual(objs.list(), OBJS_ARRAY)
+    t.deepEqual(Array.from(objs), OBJS_ARRAY)
 })
 
 test('update', t => {
@@ -44,5 +44,5 @@ test('remove', t => {
     t.true(objs.remove({ id: 123 }))
     t.false(objs.remove({ id: 123 }))
     t.true(objs.remove({ id: 456 }))
-    t.deepEqual(objs.length, 1)
+    t.deepEqual([...objs].length, 1)
 })

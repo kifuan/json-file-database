@@ -40,6 +40,12 @@ export default class ArrayCollection<T extends object, P extends keyof T> implem
         return [left, false]
     }
 
+    *[Symbol.iterator]() : Iterator<T> {
+        for (let i = 0; i < this.elements.length; i++) {
+            yield this.elements[i]
+        }
+    }
+
     insert(el: T): boolean {
         const [index, found] = this.binarySearchIndex(el)
         if (found) {
@@ -98,13 +104,5 @@ export default class ArrayCollection<T extends object, P extends keyof T> implem
 
     findAll(cond: Condition<T>): readonly T[] {
         return this.elements.filter(cond)
-    }
-
-    list(): readonly T[] {
-        return this.elements
-    }
-
-    get length(): number {
-        return this.elements.length
     }
 }

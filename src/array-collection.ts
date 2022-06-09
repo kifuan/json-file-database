@@ -20,7 +20,10 @@ export class ArrayCollection<T extends object, P extends keyof T> implements Col
         this.save(this.name, () => this.elements)
     }
 
-    private binarySearchIndex(el: Pick<T, P>) : number {
+    /**
+     * @returns the index to insert or get, and whether it has found the element. 
+     */
+    private binarySearchIndex(el: Pick<T, P>) : [number, boolean] {
         let left = 0
         let right = this.elements.length - 1
 
@@ -33,26 +36,17 @@ export class ArrayCollection<T extends object, P extends keyof T> implements Col
             } else if (cmp > 0) {
                 left = mid + 1
             } else {
-                return mid
+                return [mid, true]
             }
         }
 
-        return -1
+        return [left, false]
     }
 
     insert(el: T): boolean {
-        let index = 0
-        while (index < this.elements.length) {
-            const cur = this.elements[index]
-            const result = this.comparator(cur, el)
-
-            if (result == 0) {
-                return false
-            } else if (result > 0) {
-                break
-            }
-
-            index++
+        const [index, found] = this.binarySearchIndex(el)
+        if (found) {
+            return false
         }
         this.elements.splice(index, 0, el)
         this.startSaving()
@@ -72,8 +66,8 @@ export class ArrayCollection<T extends object, P extends keyof T> implements Col
 
     remove(el: Pick<T, P>): boolean {
         // Removing elements won't make the array unsorted.
-        const index = this.binarySearchIndex(el)
-        if (index === -1) {
+        const [index, found] = this.binarySearchIndex(el)
+        if (!found) {
             return false
         }
         this.elements.splice(index, 1)
@@ -98,8 +92,8 @@ export class ArrayCollection<T extends object, P extends keyof T> implements Col
     }
 
     find(el: Pick<T, P>): Readonly<T> | undefined {
-        const index = this.binarySearchIndex(el)
-        if (index === -1) {
+        const [index, found] = this.binarySearchIndex(el)
+        if (!found) {
             return undefined
         }
         return this.elements[index]

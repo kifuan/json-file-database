@@ -16,6 +16,8 @@ export type Save<T> = (name: string, elements: () => readonly T[]) => void
 
 /**
  * The options when creating a collection.
+ * @template T the type of elements.
+ * @template P the prime key of the type.
  */
 export type CollectionOptions<T extends object, P extends keyof T> = {
     /**

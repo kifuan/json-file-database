@@ -1,4 +1,4 @@
-import { Collection, CollectionOptions } from './collection'
+import { Collection, Comparator } from './collection'
 import { ArrayCollection } from './array-collection'
 import { AVLCollection } from './avl-collection'
 import { createFile, DatabaseFile } from './database-file'
@@ -8,14 +8,23 @@ import { createFile, DatabaseFile } from './database-file'
  * @template T the type of elements.
  * @template P the prime key of the type.
  */
-export type RequiredCollectionOptions<T extends object, P extends keyof T> =
-    Pick<CollectionOptions<T, P>, 'name' | 'comparator'> & {
-        /**
-         * The type of collection.
-         * @default 'array'
-         */
-        type?: 'array' | 'avl'
-    }
+export type RequiredCollectionOptions<T extends object, P extends keyof T> = {
+    /**
+     * The name of the collection.
+     */
+    name: string
+
+    /**
+     * The comparator to compare the elements.
+     */
+    comparator: Comparator<T, P>
+
+    /**
+     * The type of collection.
+     * @default 'array'
+     */
+    type?: 'array' | 'avl'
+}
 
 /**
  * The database type that will be provided by function `connect`.

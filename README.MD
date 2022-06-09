@@ -14,7 +14,7 @@ It uses "debouncd" function to save the data. This makes less IO operations.
 
 ## Todo
 
-Add property `comparator` for `DatabaseOptions`. If it is set, the collection will be AVL-tree based so that it can be more efficient.
+Add property `comparator` when creating `Collection`. If it is set, the collection will be AVL-tree based so that it can be more efficient.
 
 If it is not set, it is still working with array-based collection.
 
@@ -29,9 +29,9 @@ npm i json-file-database
 And then use it in your project like this:
 
 ```typescript
-import { connectSync } from 'json-file-database'
+import { connect } from 'json-file-database'
 
-const db = connectSync({  // or use await connect({ ... })
+const db = connect({
     path: './db.json',
     init: { nums: [ 1, 2, 3 ] },
     delay: 1000,

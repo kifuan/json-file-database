@@ -4,16 +4,20 @@
 </a>
 <p>It&#39;s not necessary to use a real database in some small projects, and I often use JSON files as database. However, just using <code>JSON</code> and <code>fs</code> is very inconvenient, so this project is made.</p>
 
-<a href="#note" id="note" style="color: inherit; text-decoration: none;">
-  <h2>Note</h2>
+<a href="#documentations" id="documentations" style="color: inherit; text-decoration: none;">
+  <h2>Documentations</h2>
 </a>
-<p><strong>This project is still developing!!!</strong>
-<strong>Incompatible API changes may happen!!!</strong></p>
+<p>Click <a href="https://kifuan.github.io/json-file-database/">here</a>.</p>
 
 <a href="#feature" id="feature" style="color: inherit; text-decoration: none;">
   <h2>Feature</h2>
 </a>
-<p>It uses &quot;debouncd&quot; function to save the data. This makes less IO operations.</p>
+<ul>
+<li><p>It uses &quot;debouncd&quot; function to save the data. This makes less IO operations.</p>
+</li>
+<li><p>It uses binary-search(for collection typed <code>array</code>) or AVL-tree(for collection typed <code>avl</code>) to maintain the data. This means their time complexity would be <code>O(log n)</code>.</p>
+</li>
+</ul>
 
 <a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
   <h2>Usage</h2>

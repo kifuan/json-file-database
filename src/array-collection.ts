@@ -4,29 +4,58 @@ import { Collection, CollectionOptions, Comparator, Condition, Save } from './co
  * @todo use binary search to keep the elements sorted.
  */
 export class ArrayCollection<T extends object, P extends keyof T> implements Collection<T, P> {
-    #comparator: Comparator<T, P>
-    #name: string
-    #elements: T[]
-    #save: Save<T>
+    private readonly comparator: Comparator<T, P>
+    private readonly name: string
+    private readonly elements: T[]
+    private readonly save: Save<T>
 
     constructor(options: CollectionOptions<T, P>) {
-        this.#comparator = options.comparator
-        this.#save = options.save
-        this.#name = options.name
-        this.#elements = options.elements
+        this.comparator = options.comparator
+        this.save = options.save
+        this.name = options.name
+        this.elements = options.elements.sort(this.comparator)
     }
 
-    private save() {
-        this.#save(this.#name, () => this.#elements)
+    private startSaving() {
+        this.save(this.name, () => this.elements)
+    }
+
+    private binarySearchIndex(el: Pick<T, P>) : number {
+        let left = 0
+        let right = this.elements.length - 1
+
+        while (left <= right) {
+            const mid = Math.floor((left + right) / 2)
+            const cmp = this.comparator(el, this.elements[mid])
+
+            if (cmp < 0) {
+                right = mid - 1
+            } else if (cmp > 0) {
+                left = mid + 1
+            } else {
+                return mid
+            }
+        }
+
+        return -1
     }
 
     insert(el: T): boolean {
-        if (this.has(el)) {
-            return false
+        let index = 0
+        while (index < this.elements.length) {
+            const cur = this.elements[index]
+            const result = this.comparator(cur, el)
+
+            if (result == 0) {
+                return false
+            } else if (result > 0) {
+                break
+            }
+
+            index++
         }
-        this.#elements.push(el)
-        this.#elements.sort(this.#comparator)
-        this.save()
+        this.elements.splice(index, 0, el)
+        this.startSaving()
         return true
     }
 
@@ -37,17 +66,18 @@ export class ArrayCollection<T extends object, P extends keyof T> implements Col
         }
         // We need to change the found result.
         Object.assign(found as T, el)
-        this.save()
+        this.startSaving()
         return true
     }
 
     remove(el: Pick<T, P>): boolean {
-        const index = this.#elements.findIndex(e => this.#comparator(e, el) === 0)
+        // Removing elements won't make the array unsorted.
+        const index = this.binarySearchIndex(el)
         if (index === -1) {
             return false
         }
-        this.#elements.splice(index, 1)
-        this.save()
+        this.elements.splice(index, 1)
+        this.startSaving()
         return true
     }
 
@@ -62,24 +92,28 @@ export class ArrayCollection<T extends object, P extends keyof T> implements Col
     has(cond: Condition<T>): boolean
     has(el: Pick<T, P> | Condition<T>): boolean {
         if (typeof el === 'function') {
-            return this.#elements.find(el) !== undefined
+            return this.elements.find(el) !== undefined
         }
         return this.find(el) !== undefined
     }
 
     find(el: Pick<T, P>): Readonly<T> | undefined {
-        return this.#elements.find(e => this.#comparator(e, el) === 0)
+        const index = this.binarySearchIndex(el)
+        if (index === -1) {
+            return undefined
+        }
+        return this.elements[index]
     }
 
-    findAll(cond: Condition<T>): Readonly<T[]> {
-        return this.#elements.filter(cond)
+    findAll(cond: Condition<T>): readonly T[] {
+        return this.elements.filter(cond)
     }
 
-    list(): Readonly<T[]> {
-        return this.#elements
+    list(): readonly T[] {
+        return this.elements
     }
 
     get length(): number {
-        return this.#elements.length
+        return this.elements.length
     }
 }

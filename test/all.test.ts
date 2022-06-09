@@ -17,14 +17,20 @@ function getDatabasePath(t: ExecutionContext<any>) {
     return `test/test-${title}.json`
 }
 
+type Obj = {
+    id: number
+    name: string
+}
+
+const OBJS_ARRAY = [
+    { id: 123, name: 'San Zhang' },
+    { id: 456, name: 'Si Li' },
+    { id: 789, name: 'Wu Wang' }
+]
+
 test.beforeEach(t => {
     writeFileSync(getDatabasePath(t), JSON.stringify({
-        nums: [ 123, 456, 789 ],
-        objs: [
-            { id: 123, name: 'San Zhang' },
-            { id: 456, name: 'Si Li' },
-            { id: 789, name: 'Wu Wang' }
-        ]
+        objs: OBJS_ARRAY
     }))
 })
 
@@ -47,10 +53,10 @@ test('init', async t => {
         }
     })
 
-    const nums = db<number>('nums')
+    const objs = db<Obj>('objs')
 
-    t.false(nums.has(114))
-    t.true(nums.has(123))
+    t.true(objs.has(o => o.id === 123))
+    t.false(objs.has(o => o.id === 114514))
 })
 
 test('no-save', async t => {
@@ -62,7 +68,7 @@ test('no-save', async t => {
             t.fail()
         }
     })
-    t.true(db<number>('nums').has(123))
+    t.true(db<Obj>('objs').has(o => o.id === 123))
 
     t.log('Sleep 50ms to make sure the database is not saved.')
     await sleep(50)
@@ -79,7 +85,7 @@ test('save', async t => {
         }
     })
 
-    db<number>('nums').insert(114514)
+    db<Obj>('objs').insert({ id: 114514, name: 'Koji Tadokoro' }, o => o.id === 114514)
 
     t.log('Sleep 50ms to make sure the database is saved.')
     await sleep(50)
@@ -91,14 +97,10 @@ test('update', async t => {
     const db = await connect({
         path: getDatabasePath(t)
     })
-    const objs = db<{id: number, name: string}>('objs')
-    const nums = db<number>('nums')
+    const objs = db<Obj>('objs')
 
     objs.update({ name: 'Liu Zhao' }, obj => obj.id === 123)
     t.deepEqual(objs.find(obj => obj.id === 123), { id: 123, name: 'Liu Zhao' })
-
-    nums.update(114514, 123)
-    t.true(nums.has(114514))
 })
 
 test('sync', t => {
@@ -106,10 +108,10 @@ test('sync', t => {
         path: getDatabasePath(t)
     })
 
-    const nums = db<number>('nums')
-    t.true(nums.has(123))
-    t.true(nums.has(456))
-    t.true(nums.has(789))
+    const objs = db<Obj>('objs')
+
+    t.true(objs.has(o => o.id === 123))
+    t.false(objs.has(o => o.id === 114514))
 })
 
 test('list', async t => {
@@ -117,20 +119,16 @@ test('list', async t => {
         path: getDatabasePath(t)
     })
 
-    const list = db<number>('nums').list()
-    t.deepEqual(list, [ 123, 456, 789 ])
+    const list = db<Obj>('objs').list()
+    t.deepEqual(list, OBJS_ARRAY)
 })
 
 test('find-and-has', async t => {
     const db = await connect({
         path: getDatabasePath(t)
     })
-    
-    const nums = db<number>('nums')
-    const objs = db<{ id: number, name: string }>('objs')
 
-    t.deepEqual(nums.findAll(n => n < 700), [ 123, 456 ])
-    t.deepEqual(nums.find(n => n < 400), 123)
+    const objs = db<{ id: number, name: string }>('objs')
 
     t.true(objs.has(u => u.id === 123 && u.name === 'San Zhang'))
     t.true(objs.has(u => u.id === 456 && u.name === 'Si Li'))
@@ -142,11 +140,8 @@ test('insert', async t => {
         path: getDatabasePath(t)
     })
 
-    const nums = db<number>('nums')
+    const objs = db<Obj>('objs')
     
-    t.false(nums.insert(123))
-    t.false(nums.insert(100, n => n < 900))
-
-    t.true(nums.insert(114))
-    t.true(nums.insert(123, n => n < 10)) 
+    t.false(objs.insert({ id: 114514, name: 'Koji Tadokoro' }, o => o.id === 123))
+    t.true(objs.insert({ id: 114514, name: 'Koji Tadokoro' }, o => o.id === 114514))
 })

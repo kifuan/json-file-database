@@ -51,7 +51,7 @@ export type DatabaseOptions = {
 /**
  * Connects the database.
  * @param options the options for connection
- * @return the database
+ * @returns the database
  */
 export async function connect(options: DatabaseOptions) : Promise<Database> {
     const { path, init } = options
@@ -62,7 +62,7 @@ export async function connect(options: DatabaseOptions) : Promise<Database> {
 /**
  * Connects the database synchronously.
  * @param options the options for connection
- * @return the database
+ * @returns the database
  */
 export function connectSync(options: DatabaseOptions) : Database {
     const { path, init } = options

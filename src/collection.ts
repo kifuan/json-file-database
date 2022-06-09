@@ -18,13 +18,6 @@ type CollectionOptions<T> = {
     save: () => void
 }
 
-function toCondition<T>(cond: Condition<T> | T) : Condition<T> {
-    if (typeof cond !== 'function') {
-        return n => n === cond
-    }
-    return cond as Condition<T>
-}
-
 /**
  * A collection is like an array.
  * You can insert, update, delete and find members in it.
@@ -48,12 +41,12 @@ export class Collection<T> {
      * Inserts given element to the collection.
      * @param el the element to be inserted
      * @param cond the condition to check if the element is already inserted
-     * @return whether the element is inserted
+     * @returns whether the element is inserted
      */
-    insert(el: T, cond?: Condition<T>) : boolean {
+    insert(el: T, cond: Condition<T>) : boolean {
         // Tries to use function first, and then use
         // element itself as the condition.
-        if (this.has(cond || el)) {
+        if (this.has(cond)) {
             return false
         }
         this.elements.push(el)
@@ -65,10 +58,10 @@ export class Collection<T> {
      * Updates the element that matches given condition.
      * @param el the element to be updated
      * @param cond the condition to match the element
-     * @return whether the element is updated
+     * @returns whether the element is updated
      */
-    update(el: Partial<T> | T, cond: Condition<T> | T) : boolean {
-        const index = this.elements.findIndex(toCondition(cond))
+    update(el: Partial<T> | T, cond: Condition<T>) : boolean {
+        const index = this.elements.findIndex(cond)
         if (index === -1) {
             return false
         }
@@ -88,10 +81,10 @@ export class Collection<T> {
     /**
      * Deletes the element that matches given condition.
      * @param cond the condition to match the element
-     * @return whether the element is deleted
+     * @returns whether the element is deleted
      */
-    delete(cond: Condition<T> | T) : boolean {
-        const index = this.elements.findIndex(toCondition(cond))
+    delete(cond: Condition<T>) : boolean {
+        const index = this.elements.findIndex(cond)
         if (index === -1) {
             return false
         }
@@ -104,35 +97,35 @@ export class Collection<T> {
     /**
      * Finds the element.
      * @param cond the condition to match the element
-     * @returns the element that matches given condition, or undefined if there is not
+     * @returnss the element that matches given condition, or undefined if there is not
      */
-    find(cond: Condition<T> | T) : T | undefined {
-        return this.elements.find(toCondition(cond))
+    find(cond: Condition<T>) : T | undefined {
+        return this.elements.find(cond)
     }
 
     /**
      * Finds all elements that match given condition.
      * It's better pass a function to match the elements.
      * @param cond the condition to match elements
-     * @return all elements that match given condition
+     * @returns all elements that match given condition
      */
-    findAll(cond: Condition<T> | T) : T[] {
-        return this.elements.filter(toCondition(cond))
+    findAll(cond: Condition<T>) : T[] {
+        return this.elements.filter(cond)
     }
 
     /**
      * Checks whether there is a element that matches given condition.
      * @param cond the condition to match the element
-     * @return whether there is a matched element
+     * @returns whether there is a matched element
      */
-    has(cond: Condition<T> | T) : boolean {
+    has(cond: Condition<T>) : boolean {
         return this.find(cond) !== undefined
     }
 
     /**
      * Lists all elements the collection has.
      * It will deep copy these elements.
-     * @return all elements it has
+     * @returns all elements it has
      */
     list() : T[] {
         // Deep copy the elements.

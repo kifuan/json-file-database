@@ -1,6 +1,3 @@
-import test from 'ava'
-
-import { ExecutionContext } from 'ava'
 import { connect, createObjectFile, Database, DatabaseOptions, RequiredCollectionOptions } from '../src'
 
 export function sleep(delay: number) : Promise<void> {
@@ -14,11 +11,13 @@ export type Obj = {
     name: string
 }
 
+export const COMPARATOR = (o1: Pick<Obj, 'id'>, o2: Pick<Obj, 'id'>) => o2.id - o1.id
+
 export const OBJS_ARRAY = [
     { id: 123, name: 'San Zhang' },
     { id: 456, name: 'Si Li' },
     { id: 789, name: 'Wu Wang' }
-]
+].sort(COMPARATOR)
 
 export function connectDatabase(options?: Partial<DatabaseOptions>) {
     options ||= {}
@@ -32,12 +31,7 @@ export function getObjs(db: Database, options?: Partial<RequiredCollectionOption
     options ||= {}
     return db<Obj, 'id'>({
         name: 'objs',
-        comparator: (o1, o2) => o1.id - o2.id,
+        comparator: COMPARATOR,
         ...options
     })
 }
-
-test('shared', t => {
-    t.log('This is just the file to share functions.')
-    t.pass()
-})

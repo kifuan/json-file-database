@@ -53,7 +53,10 @@ test('init', async t => {
         }
     })
 
-    const objs = db<Obj>('objs')
+    const objs = db<Obj, 'id'>({
+        name: 'objs',
+        comparator: (o1, o2) => o1.id - o2.id
+    })
 
     t.true(objs.has(o => o.id === 123))
     t.false(objs.has(o => o.id === 114514))
@@ -68,7 +71,13 @@ test('no-save', async t => {
             t.fail()
         }
     })
-    t.true(db<Obj>('objs').has(o => o.id === 123))
+
+    const objs = db<Obj, 'id'>({
+        name: 'objs',
+        comparator: (o1, o2) => o1.id - o2.id
+    })
+
+    t.true(objs.has({ id: 123 }))
 
     t.log('Sleep 50ms to make sure the database is not saved.')
     await sleep(50)
@@ -85,7 +94,12 @@ test('save', async t => {
         }
     })
 
-    db<Obj>('objs').insert({ id: 114514, name: 'Koji Tadokoro' }, o => o.id === 114514)
+    const objs = db<Obj, 'id'>({
+        name: 'objs',
+        comparator: (o1, o2) => o1.id - o2.id
+    })
+
+    objs.insert({ id: 114514, name: 'Koji Tadokoro' })
 
     t.log('Sleep 50ms to make sure the database is saved.')
     await sleep(50)
@@ -97,10 +111,14 @@ test('update', t => {
     const db = connect({
         path: getDatabasePath(t)
     })
-    const objs = db<Obj>('objs')
+    
+    const objs = db<Obj, 'id'>({
+        name: 'objs',
+        comparator: (o1, o2) => o1.id - o2.id
+    })
 
-    objs.update({ name: 'Liu Zhao' }, obj => obj.id === 123)
-    t.deepEqual(objs.find(obj => obj.id === 123), { id: 123, name: 'Liu Zhao' })
+    objs.update({ id: 123, name: 'Liu Zhao' })
+    t.deepEqual(objs.find({ id: 123 }), { id: 123, name: 'Liu Zhao' })
 })
 
 test('list', t => {
@@ -108,8 +126,12 @@ test('list', t => {
         path: getDatabasePath(t)
     })
 
-    const list = db<Obj>('objs').list()
-    t.deepEqual(list, OBJS_ARRAY)
+    const objs = db<Obj, 'id'>({
+        name: 'objs',
+        comparator: (o1, o2) => o1.id - o2.id
+    })
+
+    t.deepEqual(objs.list(), OBJS_ARRAY)
 })
 
 test('find-and-has', t => {
@@ -117,7 +139,10 @@ test('find-and-has', t => {
         path: getDatabasePath(t)
     })
 
-    const objs = db<{ id: number, name: string }>('objs')
+    const objs = db<Obj, 'id'>({
+        name: 'objs',
+        comparator: (o1, o2) => o1.id - o2.id
+    })
 
     t.true(objs.has(u => u.id === 123 && u.name === 'San Zhang'))
     t.true(objs.has(u => u.id === 456 && u.name === 'Si Li'))
@@ -129,8 +154,11 @@ test('insert', t => {
         path: getDatabasePath(t)
     })
 
-    const objs = db<Obj>('objs')
+    const objs = db<Obj, 'id'>({
+        name: 'objs',
+        comparator: (o1, o2) => o1.id - o2.id
+    })
     
-    t.false(objs.insert({ id: 114514, name: 'Koji Tadokoro' }, o => o.id === 123))
-    t.true(objs.insert({ id: 114514, name: 'Koji Tadokoro' }, o => o.id === 114514))
+    t.true(objs.insert({ id: 114514, name: 'Koji Tadokoro' }))
+    t.false(objs.insert({ id: 114514, name: 'Koji Tadokoro' }))
 })

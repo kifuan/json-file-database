@@ -1,141 +1,105 @@
 /**
- * The condition used to compare values.
+ * The condition to to compare objects.
  */
-export type Condition<T> = (obj: T) => boolean
+export type Condition<T extends object> = (obj: T) => boolean
 
 /**
- * The options of creating a collection.
+ * The comparator to compare the objects.
+ * Different from Condition, it can tell which object is greater or smaller.
  */
-type CollectionOptions<T> = {
+export type Comparator<T extends object, P extends keyof T> = (first: Pick<T, P>, second: Pick<T, P>) => number
+
+/**
+ * The options when creating a collection.
+ */
+export type CollectionOptions<T extends object, P extends keyof T> = {
     /**
-     * The elements in array.
+     * The name of collection.
+     */
+    name: string
+
+    /** 
+     * The comparator to compare the elements.
+     */
+    comparator: Comparator<T, P>
+
+    /**
+     * The elements for the collection.
      */
     elements: T[]
 
     /**
-     * The function to save the data.
+     * To save the collection.
      */
-    save: () => void
+    save: (name: string, elements: () => T[]) => void
 }
 
 /**
  * A collection is like an array.
- * You can insert, update, delete and find members in it.
+ * You can insert, update, delete and find elements in it.
  * 
  * If you called methods that affect the collection,
  * it will start a so-called "debounced" function to save the data.
  * 
- * You should not create the collection by yourself.
- * It is created by Database object.
+ * @template T the type of element.
+ * @template P the prime key for element type.
  */
-export class Collection<T> {
-    private readonly elements: T[]
-    private readonly save: () => void
-
-    constructor(options: CollectionOptions<T>) {
-        this.elements = options.elements
-        this.save = options.save
-    }
+export interface Collection<T extends object, P extends keyof T> {
+    /**
+     * Inserts the element to the collection.
+     * @param el the element to be inserted.
+     */
+    insert(el: T) : boolean
 
     /**
-     * Inserts given element to the collection.
-     * @param el the element to be inserted
-     * @param cond the condition to check if the element is already inserted
-     * @returns whether the element is inserted
+     * Updates the element by `Object.assign`.
+     * @param el the element to be updated.
      */
-    insert(el: T, cond: Condition<T>) : boolean {
-        // Tries to use function first, and then use
-        // element itself as the condition.
-        if (this.has(cond)) {
-            return false
-        }
-        this.elements.push(el)
-        this.save()
-        return true
-    }
+    update(el: Partial<T> & Pick<T, P>) : boolean
 
     /**
-     * Updates the element that matches given condition.
-     * @param el the element to be updated
-     * @param cond the condition to match the element
-     * @returns whether the element is updated
+     * Removes the element.
+     * @param el the element to be removed.
      */
-    update(el: Partial<T> | T, cond: Condition<T>) : boolean {
-        const index = this.elements.findIndex(cond)
-        if (index === -1) {
-            return false
-        }
-
-        const found = this.elements[index]
-        if (found instanceof Object) {
-            Object.assign(found, el)
-        } else {
-            // Primitive types have no properties,
-            // so it must be the type itself.
-            this.elements[index] = el as T
-        }
-        this.save()
-        return true
-    }
+    remove(el: Pick<T, P>) : boolean
 
     /**
-     * Deletes the element that matches given condition.
-     * @param cond the condition to match the element
-     * @returns whether the element is deleted
+     * Removes all elements that match the condition.
+     * @param cond the condition to match the element to be removed.
      */
-    delete(cond: Condition<T>) : boolean {
-        const index = this.elements.findIndex(cond)
-        if (index === -1) {
-            return false
-        }
+    removeAll(cond: Condition<T>) : void
 
-        this.elements.splice(index, 1)
-        this.save()
-        return true
-    }
+    /**
+     * Checks whether the element is in this collection.
+     * @param el the element to be checked.
+     */
+    has(el: Pick<T, P>) : boolean
+
+    /**
+     * Checks whether there is an element matches the condition.
+     * @param cond the condition to match the element to be checked.
+     */
+    has(cond: Condition<T>) : boolean
 
     /**
      * Finds the element.
-     * @param cond the condition to match the element
-     * @returnss the element that matches given condition, or undefined if there is not
+     * @param el the element to be found.
      */
-    find(cond: Condition<T>) : T | undefined {
-        return this.elements.find(cond)
-    }
+    find(el: Pick<T, P>) : Readonly<T> | undefined
 
     /**
      * Finds all elements that match given condition.
-     * It's better pass a function to match the elements.
-     * @param cond the condition to match elements
-     * @returns all elements that match given condition
+     * @param cond the condition to match the elements.
      */
-    findAll(cond: Condition<T>) : T[] {
-        return this.elements.filter(cond)
-    }
+    findAll(cond: Condition<T>) : Readonly<T[]>
 
     /**
-     * Checks whether there is a element that matches given condition.
-     * @param cond the condition to match the element
-     * @returns whether there is a matched element
+     * List all elements.
      */
-    has(cond: Condition<T>) : boolean {
-        return this.find(cond) !== undefined
-    }
+    list() : Readonly<T[]>
 
     /**
-     * Lists all elements the collection has.
-     * It will deep copy these elements.
-     * @returns all elements it has
+     * Gets the length of this collection.
      */
-    list() : T[] {
-        // Deep copy the elements.
-        return JSON.parse(JSON.stringify(this.elements))
-    }
-
-    /**
-     * The length of this collection.
-     */
-    get length() : number {
-        return this.elements.length
-    }
+    get length() : number
 }

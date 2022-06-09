@@ -1,13 +1,24 @@
-import { Collection } from './collection'
+import { Collection, CollectionOptions } from './collection'
 import { readFileSync, writeFileSync } from 'fs'
+import { ArrayCollection } from './array-collection'
 
 /**
- * The database type that will be provided by connect or connectSync function.
- * 
- * It is a function that should be called with collection name and type,
- * and return the collection for you to operate.
+ * Required collection options for user.
  */
-export type Database = <T>(name: string) => Collection<T>
+export type RequiredCollectionOptions<T extends object, P extends keyof T> =
+    Pick<CollectionOptions<T, P>, 'name' | 'comparator'> & {
+        /**
+         * The type of collection.
+         * @default 'array'
+         */
+        type?: 'array' | 'avl'
+    }
+
+/**
+ * The database type that will be provided by function `connect`.
+ */
+export type Database = <T extends object, P extends keyof T>
+    (options: RequiredCollectionOptions<T, P>) => Collection<T, P>
 
 /**
  * What the Database will operate. It must contain array-typed values.
@@ -58,22 +69,33 @@ export function connect(options: DatabaseOptions) : Database {
 
     // Save the data with the technology of "debouncing".
     let timeout: NodeJS.Timeout | undefined
-    function save() {
+    function save(name: string, elements: () => any[]) {
         clearTimeout(timeout)
         timeout = setTimeout(() => {
             timeout = undefined
+            data[name] = elements()
             writeFileSync(path, JSON.stringify(data))
             onSaved?.apply(undefined)
         }, delay || 0)
     }
 
-    return <T>(name: string) => {
+    return <T extends object, P extends keyof T>(options: RequiredCollectionOptions<T, P>) => {
+        let { name, comparator, type } = options
+        type ||= 'array'
+
         // Make sure the property is an array.
         const elements: T[] = data[name] ||= []
         if (!Array.isArray(elements)) {
             throw new TypeError(`Property ${name} in the database is not an array.`)
         }
-        return new Collection<T>({ elements, save })
+
+        const collOptions = { name, comparator, elements, save }
+        
+        if (type === 'array') {
+            return new ArrayCollection<T, P>(collOptions)
+        } else {
+            throw new TypeError(`Unknown collection type ${type}.`)
+        }
     }
 }
 

@@ -11,13 +11,6 @@ It's not necessary to use a real database in some small projects, and I often us
 
 It uses "debouncd" function to save the data. This makes less IO operations.
 
-
-## Todo
-
-Add property `comparator` when creating `Collection`. If it is set, the collection will be AVL-tree based so that it can be more efficient.
-
-If it is not set, it is still working with array-based collection.
-
 ## Usage
 
 First, download it by `npm`(or `yarn`, `pnpm`, etc.).

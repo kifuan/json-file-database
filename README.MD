@@ -40,8 +40,9 @@ const db = connect({
     }
 })
 
-// Specify the type of elements is User,
-// and the prime key is id.
+// Specify the type of elements is User, and the prime key is id.
+// You can go to the documentations to see how to customize all
+// options, including the `comparator` to compare the elements.
 const users = db<User>('users')
 
 // Find the user with prime key id.

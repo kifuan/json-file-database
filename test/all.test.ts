@@ -2,7 +2,7 @@ import test, { ExecutionContext } from 'ava'
 import { unlinkSync, readdirSync, writeFileSync } from 'fs'
 import path from 'path'
 
-import { connect, connectSync } from '../src'
+import { connect } from '../src'
 
 function sleep(delay: number) : Promise<void> {
     return new Promise(resolve => {
@@ -46,7 +46,7 @@ test.after(t => {
 })
 
 test('init', async t => {
-    const db = await connect({
+    const db = connect({
         path: getDatabasePath(t),
         init: {
             nums: [ 114, 514 ]
@@ -61,7 +61,7 @@ test('init', async t => {
 
 test('no-save', async t => {
     let notSaved = true
-    const db = await connect({
+    const db = connect({
         path: getDatabasePath(t),
         onSaved() {
             notSaved = false
@@ -93,8 +93,8 @@ test('save', async t => {
     t.true(saved)
 })
 
-test('update', async t => {
-    const db = await connect({
+test('update', t => {
+    const db = connect({
         path: getDatabasePath(t)
     })
     const objs = db<Obj>('objs')
@@ -103,19 +103,8 @@ test('update', async t => {
     t.deepEqual(objs.find(obj => obj.id === 123), { id: 123, name: 'Liu Zhao' })
 })
 
-test('sync', t => {
-    const db = connectSync({
-        path: getDatabasePath(t)
-    })
-
-    const objs = db<Obj>('objs')
-
-    t.true(objs.has(o => o.id === 123))
-    t.false(objs.has(o => o.id === 114514))
-})
-
-test('list', async t => {
-    const db = await connect({
+test('list', t => {
+    const db = connect({
         path: getDatabasePath(t)
     })
 
@@ -123,8 +112,8 @@ test('list', async t => {
     t.deepEqual(list, OBJS_ARRAY)
 })
 
-test('find-and-has', async t => {
-    const db = await connect({
+test('find-and-has', t => {
+    const db = connect({
         path: getDatabasePath(t)
     })
 
@@ -135,8 +124,8 @@ test('find-and-has', async t => {
     t.true(objs.has(u => u.id === 789 && u.name === 'Wu Wang'))
 })
 
-test('insert', async t => {
-    const db = await connect({
+test('insert', t => {
+    const db = connect({
         path: getDatabasePath(t)
     })
 

@@ -1,6 +1,5 @@
 import { Collection } from './collection'
-import { readFile, writeFile } from 'fs/promises'
-import { readFileSync } from 'fs'
+import { readFileSync, writeFileSync } from 'fs'
 
 /**
  * The database type that will be provided by connect or connectSync function.
@@ -49,29 +48,13 @@ export type DatabaseOptions = {
 }
 
 /**
- * Connects the database.
- * @param options the options for connection
- * @returns the database
- */
-export async function connect(options: DatabaseOptions) : Promise<Database> {
-    const { path, init } = options
-    const data = await readDatabaseFile(path, init)
-    return createDatabase(data, options)
-}
-
-/**
  * Connects the database synchronously.
  * @param options the options for connection
  * @returns the database
  */
-export function connectSync(options: DatabaseOptions) : Database {
-    const { path, init } = options
-    const data = readDatabaseFileSync(path, init)
-    return createDatabase(data, options)
-}
-
-function createDatabase(data: JSONData, options: DatabaseOptions) : Database {
-    const { path, delay, onSaved } = options
+export function connect(options: DatabaseOptions) : Database {
+    const { path, delay, onSaved, init } = options
+    const data = readDatabaseFile(path, init)
 
     // Save the data with the technology of "debouncing".
     let timeout: NodeJS.Timeout | undefined
@@ -79,7 +62,8 @@ function createDatabase(data: JSONData, options: DatabaseOptions) : Database {
         clearTimeout(timeout)
         timeout = setTimeout(() => {
             timeout = undefined
-            writeFile(path, JSON.stringify(data)).then(() => onSaved?.apply(undefined))
+            writeFileSync(path, JSON.stringify(data))
+            onSaved?.apply(undefined)
         }, delay || 0)
     }
 
@@ -93,18 +77,7 @@ function createDatabase(data: JSONData, options: DatabaseOptions) : Database {
     }
 }
 
-async function readDatabaseFile(path: string, init?: JSONData) : Promise<JSONData> {
-    try {
-        return JSON.parse(await readFile(path, 'utf-8'))
-    } catch (err) {
-        if (!init) {
-            throw err
-        }
-        return init
-    }
-}
-
-function readDatabaseFileSync(path: string, init?: JSONData) : JSONData {
+function readDatabaseFile(path: string, init?: JSONData) : JSONData {
     try {
         return JSON.parse(readFileSync(path, 'utf-8'))
     } catch (err) {

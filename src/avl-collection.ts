@@ -68,9 +68,9 @@ class AVLTree<T extends object, P extends keyof T> {
 
     private rotateLL(k1: Node<T>) : Node<T> {
         const k2 = k1.left!
-        
-        k2.right = k1
+
         k1.left = k2.right
+        k2.right = k1
 
         k1.height = this.calcHeight(k1)
         k2.height = this.calcHeight(k2)
@@ -80,6 +80,7 @@ class AVLTree<T extends object, P extends keyof T> {
 
     private rotateRR(k1: Node<T>) : Node<T> {
         const k2 = k1.right!
+
         k1.right = k2.left
         k2.left = k1
 
@@ -197,24 +198,24 @@ class AVLTree<T extends object, P extends keyof T> {
 }
 
 export class AVLCollection<T extends object, P extends keyof T> implements Collection<T, P> {
-    #name: string
-    #save: Save<T>
-    #tree: AVLTree<T, P>
+    private readonly name: string
+    private readonly save: Save<T>
+    private readonly tree: AVLTree<T, P>
 
-    private save() {
-        this.#save(this.#name, () => this.list())
+    private startSaving() {
+        this.save(this.name, () => this.list())
     }
 
     constructor(options: CollectionOptions<T, P>) {
-        this.#save = options.save
-        this.#name = options.name
-        this.#tree = new AVLTree<T, P>(options.comparator)
-        options.elements.forEach(el => this.#tree.insert(el))
+        this.save = options.save
+        this.name = options.name
+        this.tree = new AVLTree<T, P>(options.comparator)
+        options.elements.forEach(el => this.tree.insert(el))
     }
 
     insert(el: T): boolean {
-        const result = this.#tree.insert(el)
-        result && this.save()
+        const result = this.tree.insert(el)
+        result && this.startSaving()
         return result
     }
 
@@ -224,13 +225,13 @@ export class AVLCollection<T extends object, P extends keyof T> implements Colle
             return false
         }
         Object.assign(obj, el)
-        this.save()
+        this.startSaving()
         return true
     }
 
     remove(el: Pick<T, P>): boolean {
-        const result = this.#tree.remove(el)
-        result && this.save()
+        const result = this.tree.remove(el)
+        result && this.startSaving()
         return result
     }
 
@@ -251,7 +252,7 @@ export class AVLCollection<T extends object, P extends keyof T> implements Colle
     }
 
     find(el: Pick<T, P>): Readonly<T> | undefined {
-        return this.#tree.find(el)
+        return this.tree.find(el)
     }
 
     findAll(cond: Condition<T>): readonly T[] {
@@ -259,10 +260,10 @@ export class AVLCollection<T extends object, P extends keyof T> implements Colle
     }
 
     list(): readonly T[] {
-        return this.#tree.list()
+        return this.tree.list()
     }
 
     get length(): number {
-        return this.#tree.count
+        return this.tree.count
     }
 }

@@ -4,8 +4,16 @@ import { readFileSync, writeFileSync } from 'fs'
  * The file for the database to read.
  */
 export interface DatabaseFile {
+    /**
+     * Reads the content of the file.
+     * @returns the content.
+     */
     read() : string
 
+    /**
+     * Writes the content to the file.
+     * @param content the content to be written.
+     */
     write(content: string) : void
 }
 

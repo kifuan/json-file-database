@@ -1,11 +1,12 @@
 import { Collection, CollectionOptions } from './collection'
-import { readFileSync, writeFileSync } from 'fs'
 import { ArrayCollection } from './array-collection'
 import { AVLCollection } from './avl-collection'
 import { createFile, DatabaseFile } from './database-file'
 
 /**
  * Required collection options for user.
+ * @template T the type of elements.
+ * @template P the prime key of the type.
  */
 export type RequiredCollectionOptions<T extends object, P extends keyof T> =
     Pick<CollectionOptions<T, P>, 'name' | 'comparator'> & {
@@ -18,6 +19,9 @@ export type RequiredCollectionOptions<T extends object, P extends keyof T> =
 
 /**
  * The database type that will be provided by function `connect`.
+ * @template T the type of elements.
+ * @template P the prime key of the type.
+ * @param options the options to create the collection.
  */
 export type Database = <T extends object, P extends keyof T>
     (options: RequiredCollectionOptions<T, P>) => Collection<T, P>
@@ -41,30 +45,29 @@ export type DatabaseOptions = {
 
     /**
      * The delay of each saving action.
-     * 
-     * It will be 0 by default.
+     * @default 0
      */
     delay?: number
 
     /**
      * If the database file does not exist,
      * it will create a new file with this object in it.
-     * 
-     * It will be an empty object by default.
+     * @default {}
      */
     init?: JSONData
 
     /**
      * After the database file is saved,
      * this function will be called if it is not undefined.
+     * @default ()=>{}
      */
     onSaved?: (this: undefined) => void
 }
 
 /**
  * Connects the database synchronously.
- * @param options the options for connection
- * @returns the database
+ * @param options the options for connection.
+ * @returns the database.
  */
 export function connect(options: DatabaseOptions) : Database {
     let { file, delay, onSaved, init } = options
@@ -73,6 +76,7 @@ export function connect(options: DatabaseOptions) : Database {
         file = createFile(file)
     }
     delay ||= 0
+    onSaved ||= () => {}
     
     const data = readDatabaseFile(file, init)
 
@@ -85,7 +89,7 @@ export function connect(options: DatabaseOptions) : Database {
             data[name] = elements()
             const f = file as unknown as DatabaseFile
             f.write(JSON.stringify(data))
-            onSaved?.apply(undefined)
+            onSaved!.apply(undefined)
         }, delay)
     }
 
@@ -101,6 +105,7 @@ export function connect(options: DatabaseOptions) : Database {
 
         const collOptions = { name, comparator, elements, save }
         
+        // Create the collection depending on the type.
         if (type === 'array') {
             return new ArrayCollection<T, P>(collOptions)
         } else if (type === 'avl') {

@@ -35,4 +35,12 @@ test('insert', t => {
     t.false(objs.insert({ id: 114514, name: 'Koji Tadokoro' }))
 })
 
-test.todo('remove')
+test('remove', t => {
+    const db = connectDatabase()
+    const objs = getObjs(db)
+
+    t.true(objs.remove({ id: 123 }))
+    t.false(objs.remove({ id: 123 }))
+    t.true(objs.remove({ id: 456 }))
+    t.deepEqual(objs.length, 1)
+})

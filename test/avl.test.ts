@@ -37,5 +37,12 @@ test('find-and-has', t => {
     t.false(objs.has({ id: 114514 }))
 })
 
+test('remove', t => {
+    const db = connectDatabase()
+    const objs = getObjs(db, { type: 'avl' })
 
-test.todo('remove')
+    t.true(objs.remove({ id: 123 }))
+    t.false(objs.remove({ id: 123 }))
+    t.true(objs.remove({ id: 456 }))
+    t.deepEqual(objs.length, 1)
+})

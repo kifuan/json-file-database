@@ -1,2 +1,6 @@
 export * from './database'
-export * from './collection'
+export {
+    Collection,
+    Comparator,
+    Condition
+} from './collection'

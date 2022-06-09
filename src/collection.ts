@@ -10,6 +10,11 @@ export type Condition<T extends object> = (obj: T) => boolean
 export type Comparator<T extends object, P extends keyof T> = (first: Pick<T, P>, second: Pick<T, P>) => number
 
 /**
+ * The function to save the collection.
+ */
+export type Save<T> = (name: string, elements: () => readonly T[]) => void
+
+/**
  * The options when creating a collection.
  */
 export type CollectionOptions<T extends object, P extends keyof T> = {
@@ -31,7 +36,7 @@ export type CollectionOptions<T extends object, P extends keyof T> = {
     /**
      * To save the collection.
      */
-    save: (name: string, elements: () => T[]) => void
+    save: Save<T>
 }
 
 /**

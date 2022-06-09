@@ -1,6 +1,7 @@
 import { Collection, CollectionOptions } from './collection'
 import { readFileSync, writeFileSync } from 'fs'
 import { ArrayCollection } from './array-collection'
+import { AVLCollection } from './avl-collection'
 
 /**
  * Required collection options for user.
@@ -24,7 +25,7 @@ export type Database = <T extends object, P extends keyof T>
  * What the Database will operate. It must contain array-typed values.
  */
 export type JSONData = {
-    [key: string] : any[]
+    [key: string] : readonly any[]
 }
 
 /**
@@ -69,7 +70,7 @@ export function connect(options: DatabaseOptions) : Database {
 
     // Save the data with the technology of "debouncing".
     let timeout: NodeJS.Timeout | undefined
-    function save(name: string, elements: () => any[]) {
+    function save(name: string, elements: () => readonly any[]) {
         clearTimeout(timeout)
         timeout = setTimeout(() => {
             timeout = undefined
@@ -84,7 +85,7 @@ export function connect(options: DatabaseOptions) : Database {
         type ||= 'array'
 
         // Make sure the property is an array.
-        const elements: T[] = data[name] ||= []
+        const elements: readonly T[] = data[name] ||= []
         if (!Array.isArray(elements)) {
             throw new TypeError(`Property ${name} in the database is not an array.`)
         }
@@ -93,6 +94,8 @@ export function connect(options: DatabaseOptions) : Database {
         
         if (type === 'array') {
             return new ArrayCollection<T, P>(collOptions)
+        } else if (type === 'avl') {
+            return new AVLCollection<T, P>(collOptions)
         } else {
             throw new TypeError(`Unknown collection type ${type}.`)
         }

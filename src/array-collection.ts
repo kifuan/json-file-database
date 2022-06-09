@@ -1,4 +1,4 @@
-import { Collection, CollectionOptions, Comparator, Condition } from './collection'
+import { Collection, CollectionOptions, Comparator, Condition, Save } from './collection'
 
 /**
  * @todo use binary search to keep the elements sorted.
@@ -7,7 +7,7 @@ export class ArrayCollection<T extends object, P extends keyof T> implements Col
     #comparator: Comparator<T, P>
     #name: string
     #elements: T[]
-    #save: (name: string, elements: () => T[]) => void
+    #save: Save<T>
 
     constructor(options: CollectionOptions<T, P>) {
         this.#comparator = options.comparator

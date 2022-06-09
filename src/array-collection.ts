@@ -1,8 +1,5 @@
 import { Collection, CollectionOptions, Comparator, Condition, Save } from './collection'
 
-/**
- * @todo use binary search to keep the elements sorted.
- */
 export class ArrayCollection<T extends object, P extends keyof T> implements Collection<T, P> {
     private readonly comparator: Comparator<T, P>
     private readonly name: string

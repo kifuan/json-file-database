@@ -1,6 +1,6 @@
 import { Collection, InternalCollectionOptions, Comparator, Condition, Save } from './collection'
 
-export class ArrayCollection<T extends object, P extends keyof T> implements Collection<T, P> {
+export default class ArrayCollection<T extends object, P extends keyof T> implements Collection<T, P> {
     private readonly comparator: Comparator<T, P>
     private readonly name: string
     private readonly elements: T[]

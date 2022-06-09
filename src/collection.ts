@@ -19,7 +19,7 @@ export type Save<T> = (name: string, elements: () => readonly T[]) => void
  * @template T the type of elements.
  * @template P the prime key of the type.
  */
-export type InternalCollectionOptions<T extends object, P extends keyof T> = {
+export interface InternalCollectionOptions<T extends object, P extends keyof T> {
     /**
      * The name of collection.
      */

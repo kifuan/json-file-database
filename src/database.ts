@@ -1,14 +1,14 @@
 import { Collection, Comparator } from './collection'
-import { ArrayCollection } from './array-collection'
-import { AVLCollection } from './avl-collection'
 import { createFile, DatabaseFile } from './database-file'
+import ArrayCollection from './array-collection'
+import AVLCollection from './avl-collection'
 
 /**
  * Required collection options for user.
  * @template T the type of elements.
  * @template P the prime key of the type.
  */
-export type CollectionOptions<T extends object, P extends keyof T> = {
+export interface CollectionOptions<T extends object, P extends keyof T> {
     /**
      * The name of the collection.
      */
@@ -39,14 +39,14 @@ export interface Database {
 /**
  * What the Database will operate. It must contain array-typed values.
  */
-export type JSONData = {
+export interface JSONData {
     [key: string] : readonly any[]
 }
 
 /**
  * The options when creating a connection of database file.
  */
-export type DatabaseOptions = {
+export interface DatabaseOptions {
     /**
      * The file to process.
      * If it is a string, it will be seen as a path to the file.

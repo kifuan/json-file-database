@@ -197,7 +197,7 @@ class AVLTree<T extends object, P extends keyof T> {
     }
 }
 
-export class AVLCollection<T extends object, P extends keyof T> implements Collection<T, P> {
+export default class AVLCollection<T extends object, P extends keyof T> implements Collection<T, P> {
     private readonly name: string
     private readonly save: Save<T>
     private readonly tree: AVLTree<T, P>

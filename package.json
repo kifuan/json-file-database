@@ -1,6 +1,6 @@
 {
     "name": "json-file-database",
-    "version": "1.3.3",
+    "version": "1.3.4",
     "description": "Lightweight Database on NodeJS by JSON files",
     "keywords": [
         "lightweight",
@@ -16,7 +16,7 @@
     },
     "scripts": {
         "test": "tsc && ava",
-        "publish": "tsc && npm publish"
+        "prepublish": "tsc"
     },
     "author": "kifuan",
     "license": "MIT",

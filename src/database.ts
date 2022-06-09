@@ -66,6 +66,9 @@ export interface DatabaseOptions {
 
 /**
  * The database that will be provided by function `connect`.
+ * 
+ * Note that if the comparator is not provided, it will compare
+ * the `id` property as number for each element.
  */
 export interface Database {
     /**

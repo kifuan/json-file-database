@@ -1,6 +1,6 @@
 # JSON File Database
 
-It's not necessary to use a real database in some small projects, and I often use JSON files as database. However, just using `JSON` and `fs` is very inconvenient, so this project is made.
+It's not necessary to use a real database in some small projects, and I often use JSON files as databases. However, just using `JSON` and `fs` is very inconvenient, so this project is made.
 
 ## Documentations
 

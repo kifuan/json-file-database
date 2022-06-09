@@ -4,7 +4,7 @@ It's not necessary to use a real database in some small projects, and I often us
 
 ## Documentations
 
-Click [here](https://kifuan.github.io/json-file-database/).
+Click [here](https://kifuan.github.io/json-file-database/modules.html).
 
 ## Features
 

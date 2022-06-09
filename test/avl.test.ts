@@ -1,4 +1,5 @@
 import test from 'ava'
+import { connect, createObjectFile } from '../src'
 import { connectDatabase, getObjs, OBJS_ARRAY } from './shared'
 
 test('insert', t => {
@@ -45,4 +46,26 @@ test('remove', t => {
     t.false(objs.remove({ id: 123 }))
     t.true(objs.remove({ id: 456 }))
     t.deepEqual([...objs].length, 1)
+})
+
+test('sort', t => {
+    const numsArr = [63, 3, 57, 7, 62, 9]
+    const insertArr = [77, 23, 6, 56]
+
+    const db = connect({
+        file: createObjectFile({
+            nums: numsArr.map(item => ({ val: item }))
+        })
+    })
+    const nums = db<{ val: number }, 'val'>({
+        name: 'nums',
+        type: 'avl',
+        comparator: (first, second) => first.val - second.val
+    })
+
+    insertArr.forEach(i => nums.insert({ val: i }))
+
+    const expected = numsArr.concat(insertArr).sort((a, b) => a - b)
+    const actual = Array.from(nums).map(n => n.val)
+    t.deepEqual(actual, expected)
 })

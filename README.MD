@@ -42,10 +42,7 @@ const db = connect({
 
 // Specify the type of elements is User,
 // and the prime key is id.
-const users = db<User, 'id'>({
-    name: 'users',
-    comparator: (u1, u2) => u1.id - u2.id
-})
+const users = db<User>('users')
 
 // Find the user with prime key id.
 console.log('The user whose id is 1:', users.find({ id: 1 }))

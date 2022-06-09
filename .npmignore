@@ -2,4 +2,5 @@ src/
 test/
 dist/test/
 tsconfig.json
-.vscide
+.vscode/
+docs/

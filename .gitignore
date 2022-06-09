@@ -1,4 +1,4 @@
 dist
 node_modules
 test/test-*.json
-.vscode
+.vscode/

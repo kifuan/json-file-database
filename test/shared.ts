@@ -1,4 +1,4 @@
-import { connect, createObjectFile, Database, DatabaseOptions, CollectionOptions } from '../src'
+import { connect, createObjectFile, DatabaseOptions } from '../src'
 
 export function sleep(delay: number) : Promise<void> {
     return new Promise(resolve => {

@@ -3,5 +3,6 @@ export * from './database-file'
 export {
     Collection,
     Comparator,
-    Condition
+    Condition,
+    Element
 } from './collection'

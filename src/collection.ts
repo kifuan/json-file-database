@@ -7,24 +7,34 @@
 }
 
 /**
- * The condition to to compare objects.
+ * The condition to to compare elements.
+ * @template E the type of elements.
+ * @template I the type of id.
+ * @param el the element.
+ * @returns whether the element matches the condition.
  */
-export type Condition<E extends Element<I>, I> = (obj: E) => boolean
+export type Condition<E extends Element<I>, I> = (el: Readonly<E>) => boolean
 
 /**
- * The comparator to compare prime keys for objects.
+ * The comparator to compare the id of elements.
+ * @template I the type of id.
+ * @param first the first id.
+ * @param second the second id.
+ * @returns the comparing result.
  */
 export type Comparator<I> = (first: I, second: I) => number
 
 /**
  * The function to save the collection.
+ * @param name the name of the collection.
+ * @param elements the getter of elements to be saved in JSON file.
  */
 export type Save = (name: string, elements: () => readonly any[]) => void
 
 /**
  * The options when creating a collection.
- * @template T the type of elements.
- * @template P the prime key of the type.
+ * @template E the type of elements.
+ * @template I the type of id.
  */
 export interface InternalCollectionOptions<E extends Element<I>, I> {
     /**
@@ -38,7 +48,7 @@ export interface InternalCollectionOptions<E extends Element<I>, I> {
     comparator: Comparator<I>
 
     /**
-     * The elements for the collection.
+     * The elements of the collection.
      */
     elements: E[]
 
@@ -57,10 +67,10 @@ export interface InternalCollectionOptions<E extends Element<I>, I> {
  * 
  * Besides, you can also use `Array.from(collection)`, `[...collection]`,
  * or `for (const element of collection)` if you want, as it implemented
- * the Iterable<T>.
+ * the Iterable<E>.
  * 
- * @template T the type of element.
- * @template P the prime key for element type.
+ * @template E the type of elements.
+ * @template I the type of id.
  */
 export interface Collection<E extends Element<I>, I> extends Iterable<E> {
     /**
@@ -72,14 +82,15 @@ export interface Collection<E extends Element<I>, I> extends Iterable<E> {
 
     /**
      * Updates the element by `Object.assign`.
-     * @param el the element to be updated.
+     * @param id the id of element to be updated.
+     * @param el the element to be updated, except 'id' property.
      * @returns whether it has updated the element.
      */
     update(id: I, el: Partial<Omit<E, 'id'>>) : boolean
 
     /**
      * Removes the element.
-     * @param el the element to be removed.
+     * @param id the id of the element to be removed.
      * @returns whether it has removed the element.
      */
     remove(id: I) : boolean
@@ -93,7 +104,7 @@ export interface Collection<E extends Element<I>, I> extends Iterable<E> {
 
     /**
      * Checks whether the element is in this collection.
-     * @param el the element to be checked.
+     * @param id the id of element to be checked.
      * @returns whether the element is in this collection.
      */
     has(id: I) : boolean
@@ -107,7 +118,7 @@ export interface Collection<E extends Element<I>, I> extends Iterable<E> {
 
     /**
      * Finds the element.
-     * @param el the element to be found.
+     * @param id the id of element to be found.
      * @returns the found element, or undefined if it hasn't found.
      */
     find(id: I) : Readonly<E> | undefined

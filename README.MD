@@ -25,6 +25,10 @@ And then use it in your project like this:
 ```typescript
 import { connect } from 'json-file-database'
 
+/**
+ * The type of elements must have a `id` property
+ * to make them unique and sorted in the collection.
+ */
 type User = { id: number, name: string }
 
 // Connect the database. If there is not the file yet,
@@ -40,13 +44,13 @@ const db = connect({
     }
 })
 
-// Specify the type of elements is User, and the prime key is id.
+// Specify the type of elements is User.
 // You can go to the documentations to see how to customize all
 // options, including the `comparator` to compare the elements.
 const users = db<User>('users')
 
-// Find the user with prime key id.
-console.log('The user whose id is 1:', users.find({ id: 1 }))
+// Find the user with id.
+console.log('The user whose id is 1:', users.find(1))
 
 
 // Find all users with given condition.
@@ -54,7 +58,7 @@ console.log('All users whose id <= 2 are:', users.findAll(u => u.id <= 2))
 
 
 // Check whether the collection has it.
-console.log('Whether the collection has a user whose id is 5:', users.has({ id: 5 }))
+console.log('Whether the collection has a user whose id is 5:', users.has(5))
 
 
 // Insert the user and return if it is succeeded.
@@ -67,7 +71,7 @@ console.log('All users are:', Array.from(users))
 
 
 // Remove the user whose id is 1, and check whether it has removed the user.
-console.log('Remove the user whose id is 1:', users.remove({ id: 1 }))
+console.log('Remove the user whose id is 1:', users.remove(1))
 
 
 // Remove all users that match the condition, and return the number of them.
@@ -76,7 +80,7 @@ console.log('Remove all users whose id < 3, the number of them is:',
 
 
 // Update the user with prime key, and return whether it has updated the user.
-console.log('Update the user whose id is 3:', users.update({ id: 3, name: 'Liu Zhao' }))
+console.log('Update the user whose id is 3:', users.update(3, { name: 'Liu Zhao' }))
 ```
 
 At the first time you run, it will create a new file `db.json` and all outputs are expected. However, when you try to run it again, the outputs are not the same.

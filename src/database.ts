@@ -4,8 +4,8 @@ import ArrayCollection from './array-collection'
 import AVLCollection from './avl-collection'
 
 /**
- * Required collection options for user.
- * @template I the type of prime key.
+ * Options to create a collection.
+ * @template I the type of id.
  */
 export interface CollectionOptions<I> {
     /**
@@ -69,7 +69,12 @@ export interface DatabaseOptions {
  */
 export interface Database {
     /**
+     * Creates a collection by full information.
      * 
+     * @template E the type of elements.
+     * @template I the type of id.
+     * @param options the options to create the collection.
+     * @returns the collection.
      */
     <E extends Element<I>, I = number>(options: CollectionOptions<I>): Collection<E, I>
 

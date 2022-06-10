@@ -1,25 +1,32 @@
 /**
- * The condition to to compare objects.
+ * The element will be used in collections.
+ * @template K the type of id.
  */
-export type Condition<T extends object> = (obj: T) => boolean
+ export interface Element<K> {
+    id: K
+}
 
 /**
- * The comparator to compare the objects.
- * Different from Condition, it can tell which object is greater or smaller.
+ * The condition to to compare objects.
  */
-export type Comparator<T extends object, P extends keyof T> = (first: Pick<T, P>, second: Pick<T, P>) => number
+export type Condition<E extends Element<K>, K> = (obj: E) => boolean
+
+/**
+ * The comparator to compare prime keys for objects.
+ */
+export type Comparator<K> = (first: K, second: K) => number
 
 /**
  * The function to save the collection.
  */
-export type Save<T> = (name: string, elements: () => readonly T[]) => void
+export type Save = (name: string, elements: () => readonly any[]) => void
 
 /**
  * The options when creating a collection.
  * @template T the type of elements.
  * @template P the prime key of the type.
  */
-export interface InternalCollectionOptions<T extends object, P extends keyof T> {
+export interface InternalCollectionOptions<E extends Element<K>, K> {
     /**
      * The name of collection.
      */
@@ -28,17 +35,17 @@ export interface InternalCollectionOptions<T extends object, P extends keyof T> 
     /** 
      * The comparator to compare the elements.
      */
-    comparator: Comparator<T, P>
+    comparator: Comparator<K>
 
     /**
      * The elements for the collection.
      */
-    elements: T[]
+    elements: E[]
 
     /**
      * To save the collection.
      */
-    save: Save<T>
+    save: Save
 }
 
 /**
@@ -55,60 +62,60 @@ export interface InternalCollectionOptions<T extends object, P extends keyof T> 
  * @template T the type of element.
  * @template P the prime key for element type.
  */
-export interface Collection<T extends object, P extends keyof T> extends Iterable<T> {
+export interface Collection<E extends Element<K>, K> extends Iterable<E> {
     /**
      * Inserts the element to the collection.
      * @param el the element to be inserted.
      * @returns whether it has inserted the element.
      */
-    insert(el: T) : boolean
+    insert(el: E) : boolean
 
     /**
      * Updates the element by `Object.assign`.
      * @param el the element to be updated.
      * @returns whether it has updated the element.
      */
-    update(el: Partial<T> & Pick<T, P>) : boolean
+    update(key: K, el: Partial<Omit<E, 'id'>>) : boolean
 
     /**
      * Removes the element.
      * @param el the element to be removed.
      * @returns whether it has removed the element.
      */
-    remove(el: Pick<T, P>) : boolean
+    remove(key: K) : boolean
 
     /**
      * Removes all elements that match the condition.
      * @param cond the condition to match the element to be removed.
      * @returns the number of elements it has removed.
      */
-    removeAll(cond: Condition<T>) : number
+    removeAll(cond: Condition<E, K>) : number
 
     /**
      * Checks whether the element is in this collection.
      * @param el the element to be checked.
      * @returns whether the element is in this collection.
      */
-    has(el: Pick<T, P>) : boolean
+    has(key: K) : boolean
 
     /**
      * Checks whether there is an element that matches the condition.
      * @param cond the condition to match the element to be checked.
      * @returns whether there is an element that matches the condition.
      */
-    has(cond: Condition<T>) : boolean
+    has(cond: Condition<E, K>) : boolean
 
     /**
      * Finds the element.
      * @param el the element to be found.
      * @returns the found element, or undefined if it hasn't found.
      */
-    find(el: Pick<T, P>) : Readonly<T> | undefined
+    find(key: K) : Readonly<E> | undefined
 
     /**
      * Finds all elements that match given condition.
      * @param cond the condition to match the elements.
      * @returns all elements that match given condition.
      */
-    findAll(cond: Condition<T>) : readonly T[]
+    findAll(cond: Condition<E, K>) : readonly E[]
 }

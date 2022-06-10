@@ -1,28 +1,27 @@
-import { Collection, Condition, Comparator, InternalCollectionOptions, Save } from './collection'
+import { Collection, Element, Condition, Comparator, InternalCollectionOptions, Save } from './collection'
 
-type Node<T> = {
-    val: T
+type Node<E> = {
+    el: E
     height: number
-    left?: Node<T>
-    right?: Node<T>
+    left?: Node<E>
+    right?: Node<E>
 }
+class AVLTree<E extends Element<K>, K> implements Iterable<E> {
+    private root: Node<E> | undefined
+    private comparator: Comparator<K>
 
-class AVLTree<T extends object, P extends keyof T> implements Iterable<T> {
-    private root: Node<T> | undefined
-    private comparator: Comparator<T, P>
-
-    constructor(comparator: Comparator<T, P>) {
+    constructor(comparator: Comparator<K>) {
         this.comparator = comparator
     }
 
-    *[Symbol.iterator]() : Iterator<T> {
+    *[Symbol.iterator]() : Iterator<E> {
         // Inorder iteration
         if (this.root === undefined) {
             return
         }
 
-        const stack : Node<T>[] = []
-        let cur: Node<T> | undefined = this.root
+        const stack : Node<E>[] = []
+        let cur: Node<E> | undefined = this.root
 
         while (stack.length !== 0 || cur !== undefined) {
             while (cur) {
@@ -30,36 +29,36 @@ class AVLTree<T extends object, P extends keyof T> implements Iterable<T> {
                 cur = cur.left
             }
             const n = stack.pop()!
-            yield n.val
+            yield n.el
             cur = n.right
         }
     }
 
-    find(val: Pick<T, P>) : T | undefined {
-        return this.pFind(this.root, val)?.val
+    find(key: K) : E | undefined {
+        return this.pFind(this.root, key)?.el
     }
 
-    remove(val: Pick<T, P>) {
-        const { node, removed } = this.pRemove(this.root, val)
+    remove(key: K) {
+        const { node, removed } = this.pRemove(this.root, key)
         this.root = node
         return removed
     }
 
-    insert(val: T) {
-        const { node, inserted } = this.pInsert(this.root, val)
+    insert(el: E) {
+        const { node, inserted } = this.pInsert(this.root, el)
         this.root = node
         return inserted
     }
 
-    private height(node: Node<T> | undefined) {
+    private height(node: Node<E> | undefined) {
         return node ? node.height : -1
     }
 
-    private calcHeight(node: Node<T>) : number {
+    private calcHeight(node: Node<E>) : number {
         return Math.max(this.height(node.left), this.height(node.right)) + 1
     }
 
-    private rotateLL(k1: Node<T>) : Node<T> {
+    private rotateLL(k1: Node<E>) : Node<E> {
         const k2 = k1.left!
 
         k1.left = k2.right
@@ -71,7 +70,7 @@ class AVLTree<T extends object, P extends keyof T> implements Iterable<T> {
         return k2
     }
 
-    private rotateRR(k1: Node<T>) : Node<T> {
+    private rotateRR(k1: Node<E>) : Node<E> {
         const k2 = k1.right!
 
         k1.right = k2.left
@@ -83,21 +82,21 @@ class AVLTree<T extends object, P extends keyof T> implements Iterable<T> {
         return k2
     }
 
-    private rotateLR(k3: Node<T>) : Node<T> {
+    private rotateLR(k3: Node<E>) : Node<E> {
         k3.left = this.rotateRR(k3.left!)
         return this.rotateLL(k3)
     }
 
-    private rotateRL(k3: Node<T>) : Node<T> {
+    private rotateRL(k3: Node<E>) : Node<E> {
         k3.right = this.rotateLL(k3.right!)
         return this.rotateRR(k3)
     }
 
-    private factor(node: Node<T>) : number {
+    private factor(node: Node<E>) : number {
         return this.height(node.left) - this.height(node.right)
     }
 
-    private balance(node: Node<T>) : Node<T> {
+    private balance(node: Node<E>) : Node<E> {
         if (this.factor(node) > 1) {
             // Left is higher.
             if (this.factor(node.left!) < 0) {
@@ -119,20 +118,20 @@ class AVLTree<T extends object, P extends keyof T> implements Iterable<T> {
         return node
     }
 
-    private pInsert(node: Node<T> | undefined, val: T) : { node: Node<T>, inserted: boolean } {
+    private pInsert(node: Node<E> | undefined, el: E) : { node: Node<E>, inserted: boolean } {
         if (node === undefined) {
-            return { node: { val, height: 0 }, inserted: true }
+            return { node: { el, height: 0 }, inserted: true }
         }
 
         let inserted = false
-        const cmp = this.comparator(val, node.val)
+        const cmp = this.comparator(el.id, node.el.id)
 
         if (cmp < 0) {
-            const result = this.pInsert(node.left, val)
+            const result = this.pInsert(node.left, el)
             node.left = result.node
             inserted = result.inserted
         } else if (cmp > 0) {
-            const result = this.pInsert(node.right, val)
+            const result = this.pInsert(node.right, el)
             node.right = result.node
             inserted = result.inserted
         }
@@ -140,36 +139,36 @@ class AVLTree<T extends object, P extends keyof T> implements Iterable<T> {
         return { node, inserted }
     }
 
-    private pFind(node: Node<T> | undefined, val: Pick<T, P>) : Node<T> | undefined {
+    private pFind(node: Node<E> | undefined, key: K) : Node<E> | undefined {
         if (node === undefined) {
             return undefined
         }
 
-        const cmp = this.comparator(val, node.val)
+        const cmp = this.comparator(key, node.el.id)
 
         if (cmp < 0) {
-            return this.pFind(node.left, val)
+            return this.pFind(node.left, key)
         } else if (cmp > 0) {
-            return this.pFind(node.right, val)
+            return this.pFind(node.right, key)
         }
 
         return node
     }
 
-    private pRemove(node: Node<T> | undefined, val: Pick<T, P>) : { node: Node<T> | undefined, removed: boolean } {
+    private pRemove(node: Node<E> | undefined, key: K) : { node: Node<E> | undefined, removed: boolean } {
         if (node === undefined) {
             return { node, removed: false }
         }
 
-        const cmp = this.comparator(val, node.val)
+        const cmp = this.comparator(key, node.el.id)
         let removed = false
 
         if (cmp < 0) {
-            const result = this.pRemove(node.left, val)
+            const result = this.pRemove(node.left, key)
             node.left = result.node
             removed = result.removed
         } else if (cmp > 0) {
-            const result = this.pRemove(node.right, val)
+            const result = this.pRemove(node.right, key)
             node.right = result.node
             removed = result.removed
         } else if (node.left !== undefined && node.right !== undefined) {
@@ -177,9 +176,9 @@ class AVLTree<T extends object, P extends keyof T> implements Iterable<T> {
             while (min.left !== undefined) {
                 min = min.left
             }
-            node.val = min.val
+            node.el = min.el
             removed = true
-            node.right = this.pRemove(node.right, node.val).node
+            node.right = this.pRemove(node.right, node.el.id).node
         } else {
             node = node.left || node.right
             removed = true
@@ -190,34 +189,34 @@ class AVLTree<T extends object, P extends keyof T> implements Iterable<T> {
     }
 }
 
-export default class AVLCollection<T extends object, P extends keyof T> implements Collection<T, P> {
+export default class AVLCollection<E extends Element<K>, K> implements Collection<E, K> {
     private readonly name: string
-    private readonly save: Save<T>
-    private readonly tree: AVLTree<T, P>
+    private readonly save: Save
+    private readonly tree: AVLTree<E, K>
 
     private startSaving() {
         this.save(this.name, () => Array.from(this))
     }
 
-    constructor(options: InternalCollectionOptions<T, P>) {
+    constructor(options: InternalCollectionOptions<E, K>) {
         this.save = options.save
         this.name = options.name
-        this.tree = new AVLTree<T, P>(options.comparator)
+        this.tree = new AVLTree<E, K>(options.comparator)
         options.elements.forEach(el => this.tree.insert(el))
     }
 
-    [Symbol.iterator](): Iterator<T> {
+    [Symbol.iterator](): Iterator<E> {
         return this.tree[Symbol.iterator]()
     }
 
-    insert(el: T): boolean {
+    insert(el: E): boolean {
         const result = this.tree.insert(el)
         result && this.startSaving()
         return result
     }
 
-    update(el: Partial<T> & Pick<T, P>): boolean {
-        const obj = this.find(el)
+    update(key: K, el: Partial<Omit<E, 'id'>>): boolean {
+        const obj = this.find(key)
         if (obj === undefined) {
             return false
         }
@@ -226,34 +225,34 @@ export default class AVLCollection<T extends object, P extends keyof T> implemen
         return true
     }
 
-    remove(el: Pick<T, P>): boolean {
-        const result = this.tree.remove(el)
+    remove(key: K): boolean {
+        const result = this.tree.remove(key)
         result && this.startSaving()
         return result
     }
 
-    removeAll(cond: Condition<T>): number {
+    removeAll(cond: Condition<E, K>): number {
         const elements = this.findAll(cond)
         const length = elements.length
-        elements.forEach(el => this.remove(el))
+        elements.forEach(el => this.remove(el.id))
         return length
     }
 
-    has(el: Pick<T, P>): boolean
-    has(cond: Condition<T>): boolean
-    has(cond: Pick<T, P> | Condition<T>): boolean {
+    has(key: K): boolean
+    has(cond: Condition<E, K>): boolean
+    has(cond: K | Condition<E, K>): boolean {
         if (typeof cond === 'function') {
-            return this.findAll(cond).length !== 0
+            return this.findAll(cond as Condition<E, K>).length !== 0
         }
         return this.find(cond) !== undefined
     }
 
-    find(el: Pick<T, P>): Readonly<T> | undefined {
-        return this.tree.find(el)
+    find(key: K): Readonly<E> | undefined {
+        return this.tree.find(key)
     }
 
-    findAll(cond: Condition<T>): readonly T[] {
-        const result: T[] = []
+    findAll(cond: Condition<E, K>): readonly E[] {
+        const result: E[] = []
 
         for (const el of this) {
             if (cond(el)) {

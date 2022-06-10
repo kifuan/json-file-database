@@ -33,8 +33,8 @@ test('update', t => {
         type: 'avl'
     })
 
-    t.true(objs.update({ id: 123, name: 'Koji Tadokoro' }))
-    t.deepEqual(objs.find({ id: 123 }), { id: 123, name: 'Koji Tadokoro' })
+    t.true(objs.update(123, { name: 'Koji Tadokoro' }))
+    t.deepEqual(objs.find(123), { id: 123, name: 'Koji Tadokoro' })
 })
 
 test('find-and-has', t => {
@@ -44,10 +44,10 @@ test('find-and-has', t => {
         type: 'avl'
     })
 
-    t.deepEqual(objs.find({ id: 123 }), { id: 123, name: 'San Zhang' })
-    t.true(objs.has({ id: 456 }))
+    t.deepEqual(objs.find(123), { id: 123, name: 'San Zhang' })
+    t.true(objs.has(456))
     t.true(objs.has(o => o.name === 'Wu Wang'))
-    t.false(objs.has({ id: 114514 }))
+    t.false(objs.has(114514))
 })
 
 test('remove', t => {
@@ -57,9 +57,9 @@ test('remove', t => {
         type: 'avl'
     })
 
-    t.true(objs.remove({ id: 123 }))
-    t.false(objs.remove({ id: 123 }))
-    t.true(objs.remove({ id: 456 }))
+    t.true(objs.remove(123))
+    t.false(objs.remove(123))
+    t.true(objs.remove(456))
     t.deepEqual([...objs].length, 1)
 })
 
@@ -69,18 +69,18 @@ test('sort', t => {
 
     const db = connect({
         file: createObjectFile({
-            nums: numsArr.map(item => ({ val: item }))
+            nums: numsArr.map(item => ({ id: item }))
         })
     })
-    const nums = db<{ val: number }, 'val'>({
+    const nums = db<{ id: number }>({
         name: 'nums',
         type: 'avl',
-        comparator: (first, second) => second.val - first.val
+        comparator: (first, second) => second - first
     })
 
-    insertArr.forEach(i => nums.insert({ val: i }))
+    insertArr.forEach(i => nums.insert({ id: i }))
 
     const expected = numsArr.concat(insertArr).sort((a, b) => b - a)
-    const actual = Array.from(nums).map(n => n.val)
+    const actual = Array.from(nums).map(n => n.id)
     t.deepEqual(actual, expected)
 })

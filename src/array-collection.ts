@@ -1,16 +1,16 @@
-import { Collection, InternalCollectionOptions, Comparator, Condition, Save } from './collection'
+import { Collection, Element, InternalCollectionOptions, Comparator, Condition, Save } from './collection'
 
-export default class ArrayCollection<T extends object, P extends keyof T> implements Collection<T, P> {
-    private readonly comparator: Comparator<T, P>
+export default class ArrayCollection<E extends Element<K>, K> implements Collection<E, K> {
+    private readonly comparator: Comparator<K>
     private readonly name: string
-    private readonly elements: T[]
-    private readonly save: Save<T>
+    private readonly elements: E[]
+    private readonly save: Save
 
-    constructor(options: InternalCollectionOptions<T, P>) {
+    constructor(options: InternalCollectionOptions<E, K>) {
         this.comparator = options.comparator
         this.save = options.save
         this.name = options.name
-        this.elements = options.elements.sort(this.comparator)
+        this.elements = options.elements.sort((a, b) => this.comparator(a.id, b.id))
     }
 
     private startSaving() {
@@ -20,13 +20,13 @@ export default class ArrayCollection<T extends object, P extends keyof T> implem
     /**
      * @returns the index to insert or get, and whether it has found the element. 
      */
-    private binarySearchIndex(el: Pick<T, P>) : [number, boolean] {
+    private binarySearchIndex(key: K) : [number, boolean] {
         let left = 0
         let right = this.elements.length - 1
 
         while (left <= right) {
             const mid = Math.floor((left + right) / 2)
-            const cmp = this.comparator(el, this.elements[mid])
+            const cmp = this.comparator(key, this.elements[mid].id)
 
             if (cmp < 0) {
                 right = mid - 1
@@ -40,14 +40,14 @@ export default class ArrayCollection<T extends object, P extends keyof T> implem
         return [left, false]
     }
 
-    *[Symbol.iterator]() : Iterator<T> {
+    *[Symbol.iterator]() : Iterator<E> {
         for (let i = 0; i < this.elements.length; i++) {
             yield this.elements[i]
         }
     }
 
-    insert(el: T): boolean {
-        const [index, found] = this.binarySearchIndex(el)
+    insert(el: E): boolean {
+        const [index, found] = this.binarySearchIndex(el.id)
         if (found) {
             return false
         }
@@ -56,20 +56,20 @@ export default class ArrayCollection<T extends object, P extends keyof T> implem
         return true
     }
 
-    update(el: Partial<T> & Pick<T, P>): boolean {
-        const found = this.find(el)
+    update(key: K, el: Partial<Omit<E, 'id'>>): boolean {
+        const found = this.find(key)
         if (found === undefined) {
             return false
         }
         // We need to change the found result.
-        Object.assign(found as T, el)
+        Object.assign(found, el)
         this.startSaving()
         return true
     }
 
-    remove(el: Pick<T, P>): boolean {
+    remove(key: K): boolean {
         // Removing elements won't make the array unsorted.
-        const [index, found] = this.binarySearchIndex(el)
+        const [index, found] = this.binarySearchIndex(key)
         if (!found) {
             return false
         }
@@ -78,31 +78,31 @@ export default class ArrayCollection<T extends object, P extends keyof T> implem
         return true
     }
 
-    removeAll(cond: Condition<T>): number {
+    removeAll(cond: Condition<E, K>): number {
         const elements = this.findAll(cond)
         const length = elements.length
-        elements.forEach(el => this.remove(el))
+        elements.forEach(el => this.remove(el.id))
         return length
     }
 
-    has(el: Pick<T, P>): boolean
-    has(cond: Condition<T>): boolean
-    has(el: Pick<T, P> | Condition<T>): boolean {
-        if (typeof el === 'function') {
-            return this.elements.find(el) !== undefined
+    has(key: K): boolean
+    has(cond: Condition<E, K>): boolean
+    has(key: K | Condition<E, K>): boolean {
+        if (typeof key === 'function') {
+            return this.elements.find(key as Condition<E, K>) !== undefined
         }
-        return this.find(el) !== undefined
+        return this.find(key) !== undefined
     }
 
-    find(el: Pick<T, P>): Readonly<T> | undefined {
-        const [index, found] = this.binarySearchIndex(el)
+    find(key: K): Readonly<E> | undefined {
+        const [index, found] = this.binarySearchIndex(key)
         if (!found) {
             return undefined
         }
         return this.elements[index]
     }
 
-    findAll(cond: Condition<T>): readonly T[] {
+    findAll(cond: Condition<E, K>): readonly E[] {
         return this.elements.filter(cond)
     }
 }

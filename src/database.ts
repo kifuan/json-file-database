@@ -1,14 +1,13 @@
-import { Collection, Comparator, InternalCollectionOptions, Save } from './collection'
+import { Collection, Comparator, Element, Save } from './collection'
 import { createFile, DatabaseFile } from './database-file'
 import ArrayCollection from './array-collection'
 import AVLCollection from './avl-collection'
 
 /**
  * Required collection options for user.
- * @template T the type of elements.
- * @template P the prime key of the type.
+ * @template K the type of prime key.
  */
-export interface CollectionOptions<T extends object, P extends keyof T> {
+export interface CollectionOptions<K> {
     /**
      * The name of the collection.
      */
@@ -16,8 +15,9 @@ export interface CollectionOptions<T extends object, P extends keyof T> {
 
     /**
      * The comparator to compare the elements.
+     * @default (a,b)=>a-b
      */
-    comparator: Comparator<T, P>
+    comparator?: Comparator<K>
 
     /**
      * The type of collection.
@@ -66,35 +66,24 @@ export interface DatabaseOptions {
 
 /**
  * The database that will be provided by function `connect`.
- * 
- * Note that if the comparator is not provided, it will compare
- * the `id` property as number for each element.
  */
 export interface Database {
     /**
-     * Creates a collection with full options.
-     * @template T the type of element.
-     * @template P the prime key of the type.
-     * @param options the options to create the collection.
-     * @returns the collection.
+     * 
      */
-    <T extends object, P extends keyof T>(options: CollectionOptions<T, P>): Collection<T, P>
+    <E extends Element<K>, K = number>(options: CollectionOptions<K>): Collection<E, K>
 
     /**
-     * Creates a collection with name, whose element's prime key is `id`.
-     * @template T the type of element, whose prime key is `id`.
-     * @param name the name of the collection.
+     * Creates a collection only by its name.
+     * 
+     * This means you cannot specify the comparator, so the type
+     * of key must be number.
+     * 
+     * @template E the element whose id is typed number.
+     * @param name the name of collection.
      * @returns the collection.
      */
-    <T extends { id: number }>(name: string): Collection<T, 'id'>
-
-    /**
-     * Creates a collection with options, whose element's prime key is `id`.
-     * @template T the type of element, whose prime key is `id`.
-     * @param options the options to create the collection.
-     * @returns the collection.
-     */
-    <T extends { id: number }>(options: Omit<CollectionOptions<T, 'id'>, 'comparator'>): Collection<T, 'id'>
+    <E extends Element<number>>(name: string): Collection<E, number>
 }
 
 function readDatabaseFile(file: DatabaseFile, init: JSONData) : JSONData {
@@ -105,7 +94,7 @@ function readDatabaseFile(file: DatabaseFile, init: JSONData) : JSONData {
     }
 }
 
-function getDataSaver(data: JSONData, delay: number, file: DatabaseFile, onSaved: () => void) : Save<any> {
+function getDataSaver(data: JSONData, delay: number, file: DatabaseFile, onSaved: () => void) : Save {
     let timeout: NodeJS.Timeout | undefined
     return (name, elements) => {
         clearTimeout(timeout)
@@ -117,14 +106,14 @@ function getDataSaver(data: JSONData, delay: number, file: DatabaseFile, onSaved
     }
 }
 
-function createDatabase(data: JSONData, save: Save<any>) : Database {
+function createDatabase(data: JSONData, save: Save) : Database {
     return (options: any) => {
         if (typeof options === 'string') {
             const name = options
             options = { name }
         }
         let { name, comparator, type } = options
-        comparator ||= (first: any, second: any) => first.id - second.id
+        comparator ||= (first: any, second: any) => first - second
         type ||= 'array'
 
         // Make sure the property is an array.

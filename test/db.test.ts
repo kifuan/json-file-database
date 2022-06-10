@@ -25,7 +25,7 @@ test('no-save', async t => {
 
     const objs = db<Obj>('objs')
 
-    t.true(objs.has({ id: 123 }))
+    t.true(objs.has(123))
 
     t.log('Sleep 50ms to make sure the database is not saved.')
     await sleep(50)
@@ -68,19 +68,19 @@ test('example', t => {
 
     const users = db<User>('users')
 
-    t.deepEqual(users.find({ id: 1 }), { id: 1, name: 'San Zhang' })
+    t.deepEqual(users.find(1), { id: 1, name: 'San Zhang' })
 
     t.deepEqual(users.findAll(u => u.id <= 2), usersArr.filter(u => u.id <= 2))
 
-    t.false(users.has({ id: 5 }))
+    t.false(users.has(5))
 
     t.false(users.insert({ id: 2, name: 'Liu Zhao' }))
 
     t.deepEqual(Array.from(users), usersArr)
 
-    t.true(users.remove({ id: 1 }))
+    t.true(users.remove(1))
 
     t.deepEqual(users.removeAll(u => u.id <= 2), 1)
 
-    t.true(users.update({ id: 3, name: 'Liu Zhao' }))
+    t.true(users.update(3, { name: 'Liu Zhao' }))
 })

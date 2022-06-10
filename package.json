@@ -15,7 +15,7 @@
         "url": "https://github.com/kifuan/json-file-database"
     },
     "scripts": {
-        "test": "tsc && ava",
+        "test": "ava",
         "prepublish": "tsc && typedoc --out docs src/index.ts"
     },
     "author": "kifuan",

@@ -45,7 +45,7 @@ export function remove(t: Test) {
     t.deepEqual([...objs].length, 1)
 }
 
-export function id(t: Test, type: 'array' | 'avl') {
+export function stringId(t: Test, type: 'array' | 'avl') {
     const wordsArr = [ 'the', 'quick', 'brown', 'fox', 'jumps' ]
     // "over the lazy dog", here we don't use "the" to make elements unique.
     const insertArr = [ 'over', 'lazy', 'dog' ]

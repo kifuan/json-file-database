@@ -1,6 +1,6 @@
 import anyTest, { TestFn } from 'ava'
 import { Collection } from '../src'
-import { findAndHas, id, insert, list, remove, sort, update } from './collection'
+import { findAndHas, stringId, insert, list, remove, sort, update } from './collection'
 import { connectDatabase, Obj } from './shared'
 
 const test = anyTest as TestFn<{
@@ -21,4 +21,4 @@ test('update', update)
 test('find-and-has', findAndHas)
 test('remove', remove)
 test('sort', t => sort(t, 'array'))
-test('id', t => id(t, 'array'))
+test('string-id', t => stringId(t, 'array'))

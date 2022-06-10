@@ -51,15 +51,12 @@ export function stringId(t: Test, type: 'array' | 'avl') {
     const insertArr = [ 'over', 'lazy', 'dog' ]
 
     const comparator = (s1: string, s2: string) => {
-        for (let i = 0; i < s1.length; i++) {
-            const c1 = s1.charCodeAt(i)
-            const c2 = s2.charCodeAt(i)
-
-            if (isNaN(c2)) {
-                return c1
-            } else if (c1 !== c2) {
-                return c1 - c2
-            }
+        if (s1 > s2) {
+            return 1
+        }
+        
+        if (s1 < s2) {
+            return -1
         }
 
         return 0

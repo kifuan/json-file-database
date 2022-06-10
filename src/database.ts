@@ -5,9 +5,9 @@ import AVLCollection from './avl-collection'
 
 /**
  * Required collection options for user.
- * @template K the type of prime key.
+ * @template I the type of prime key.
  */
-export interface CollectionOptions<K> {
+export interface CollectionOptions<I> {
     /**
      * The name of the collection.
      */
@@ -17,7 +17,7 @@ export interface CollectionOptions<K> {
      * The comparator to compare the elements.
      * @default (a,b)=>a-b
      */
-    comparator?: Comparator<K>
+    comparator?: Comparator<I>
 
     /**
      * The type of collection.
@@ -71,7 +71,7 @@ export interface Database {
     /**
      * 
      */
-    <E extends Element<K>, K = number>(options: CollectionOptions<K>): Collection<E, K>
+    <E extends Element<I>, I = number>(options: CollectionOptions<I>): Collection<E, I>
 
     /**
      * Creates a collection only by its name.

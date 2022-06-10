@@ -6,11 +6,11 @@ type Node<E> = {
     left?: Node<E>
     right?: Node<E>
 }
-class AVLTree<E extends Element<K>, K> implements Iterable<E> {
+class AVLTree<E extends Element<I>, I> implements Iterable<E> {
     private root: Node<E> | undefined
-    private comparator: Comparator<K>
+    private comparator: Comparator<I>
 
-    constructor(comparator: Comparator<K>) {
+    constructor(comparator: Comparator<I>) {
         this.comparator = comparator
     }
 
@@ -34,12 +34,12 @@ class AVLTree<E extends Element<K>, K> implements Iterable<E> {
         }
     }
 
-    find(key: K) : E | undefined {
-        return this.pFind(this.root, key)?.el
+    find(id: I) : E | undefined {
+        return this.pFind(this.root, id)?.el
     }
 
-    remove(key: K) {
-        const { node, removed } = this.pRemove(this.root, key)
+    remove(id: I) {
+        const { node, removed } = this.pRemove(this.root, id)
         this.root = node
         return removed
     }
@@ -139,36 +139,36 @@ class AVLTree<E extends Element<K>, K> implements Iterable<E> {
         return { node, inserted }
     }
 
-    private pFind(node: Node<E> | undefined, key: K) : Node<E> | undefined {
+    private pFind(node: Node<E> | undefined, id: I) : Node<E> | undefined {
         if (node === undefined) {
             return undefined
         }
 
-        const cmp = this.comparator(key, node.el.id)
+        const cmp = this.comparator(id, node.el.id)
 
         if (cmp < 0) {
-            return this.pFind(node.left, key)
+            return this.pFind(node.left, id)
         } else if (cmp > 0) {
-            return this.pFind(node.right, key)
+            return this.pFind(node.right, id)
         }
 
         return node
     }
 
-    private pRemove(node: Node<E> | undefined, key: K) : { node: Node<E> | undefined, removed: boolean } {
+    private pRemove(node: Node<E> | undefined, id: I) : { node: Node<E> | undefined, removed: boolean } {
         if (node === undefined) {
             return { node, removed: false }
         }
 
-        const cmp = this.comparator(key, node.el.id)
+        const cmp = this.comparator(id, node.el.id)
         let removed = false
 
         if (cmp < 0) {
-            const result = this.pRemove(node.left, key)
+            const result = this.pRemove(node.left, id)
             node.left = result.node
             removed = result.removed
         } else if (cmp > 0) {
-            const result = this.pRemove(node.right, key)
+            const result = this.pRemove(node.right, id)
             node.right = result.node
             removed = result.removed
         } else if (node.left !== undefined && node.right !== undefined) {
@@ -189,19 +189,19 @@ class AVLTree<E extends Element<K>, K> implements Iterable<E> {
     }
 }
 
-export default class AVLCollection<E extends Element<K>, K> implements Collection<E, K> {
+export default class AVLCollection<E extends Element<I>, I> implements Collection<E, I> {
     private readonly name: string
     private readonly save: Save
-    private readonly tree: AVLTree<E, K>
+    private readonly tree: AVLTree<E, I>
 
     private startSaving() {
         this.save(this.name, () => Array.from(this))
     }
 
-    constructor(options: InternalCollectionOptions<E, K>) {
+    constructor(options: InternalCollectionOptions<E, I>) {
         this.save = options.save
         this.name = options.name
-        this.tree = new AVLTree<E, K>(options.comparator)
+        this.tree = new AVLTree<E, I>(options.comparator)
         options.elements.forEach(el => this.tree.insert(el))
     }
 
@@ -215,8 +215,8 @@ export default class AVLCollection<E extends Element<K>, K> implements Collectio
         return result
     }
 
-    update(key: K, el: Partial<Omit<E, 'id'>>): boolean {
-        const obj = this.find(key)
+    update(id: I, el: Partial<Omit<E, 'id'>>): boolean {
+        const obj = this.find(id)
         if (obj === undefined) {
             return false
         }
@@ -225,33 +225,33 @@ export default class AVLCollection<E extends Element<K>, K> implements Collectio
         return true
     }
 
-    remove(key: K): boolean {
-        const result = this.tree.remove(key)
+    remove(id: I): boolean {
+        const result = this.tree.remove(id)
         result && this.startSaving()
         return result
     }
 
-    removeAll(cond: Condition<E, K>): number {
+    removeAll(cond: Condition<E, I>): number {
         const elements = this.findAll(cond)
         const length = elements.length
         elements.forEach(el => this.remove(el.id))
         return length
     }
 
-    has(key: K): boolean
-    has(cond: Condition<E, K>): boolean
-    has(cond: K | Condition<E, K>): boolean {
+    has(id: I): boolean
+    has(cond: Condition<E, I>): boolean
+    has(cond: I | Condition<E, I>): boolean {
         if (typeof cond === 'function') {
-            return this.findAll(cond as Condition<E, K>).length !== 0
+            return this.findAll(cond as Condition<E, I>).length !== 0
         }
         return this.find(cond) !== undefined
     }
 
-    find(key: K): Readonly<E> | undefined {
-        return this.tree.find(key)
+    find(id: I): Readonly<E> | undefined {
+        return this.tree.find(id)
     }
 
-    findAll(cond: Condition<E, K>): readonly E[] {
+    findAll(cond: Condition<E, I>): readonly E[] {
         const result: E[] = []
 
         for (const el of this) {

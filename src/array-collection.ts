@@ -1,12 +1,12 @@
 import { Collection, Element, InternalCollectionOptions, Comparator, Condition, Save } from './collection'
 
-export default class ArrayCollection<E extends Element<K>, K> implements Collection<E, K> {
-    private readonly comparator: Comparator<K>
+export default class ArrayCollection<E extends Element<I>, I> implements Collection<E, I> {
+    private readonly comparator: Comparator<I>
     private readonly name: string
     private readonly elements: E[]
     private readonly save: Save
 
-    constructor(options: InternalCollectionOptions<E, K>) {
+    constructor(options: InternalCollectionOptions<E, I>) {
         this.comparator = options.comparator
         this.save = options.save
         this.name = options.name
@@ -20,13 +20,13 @@ export default class ArrayCollection<E extends Element<K>, K> implements Collect
     /**
      * @returns the index to insert or get, and whether it has found the element. 
      */
-    private binarySearchIndex(key: K) : [number, boolean] {
+    private binarySearchIndex(id: I) : [number, boolean] {
         let left = 0
         let right = this.elements.length - 1
 
         while (left <= right) {
             const mid = Math.floor((left + right) / 2)
-            const cmp = this.comparator(key, this.elements[mid].id)
+            const cmp = this.comparator(id, this.elements[mid].id)
 
             if (cmp < 0) {
                 right = mid - 1
@@ -56,8 +56,8 @@ export default class ArrayCollection<E extends Element<K>, K> implements Collect
         return true
     }
 
-    update(key: K, el: Partial<Omit<E, 'id'>>): boolean {
-        const found = this.find(key)
+    update(id: I, el: Partial<Omit<E, 'id'>>): boolean {
+        const found = this.find(id)
         if (found === undefined) {
             return false
         }
@@ -67,9 +67,9 @@ export default class ArrayCollection<E extends Element<K>, K> implements Collect
         return true
     }
 
-    remove(key: K): boolean {
+    remove(id: I): boolean {
         // Removing elements won't make the array unsorted.
-        const [index, found] = this.binarySearchIndex(key)
+        const [index, found] = this.binarySearchIndex(id)
         if (!found) {
             return false
         }
@@ -78,31 +78,31 @@ export default class ArrayCollection<E extends Element<K>, K> implements Collect
         return true
     }
 
-    removeAll(cond: Condition<E, K>): number {
+    removeAll(cond: Condition<E, I>): number {
         const elements = this.findAll(cond)
         const length = elements.length
         elements.forEach(el => this.remove(el.id))
         return length
     }
 
-    has(key: K): boolean
-    has(cond: Condition<E, K>): boolean
-    has(key: K | Condition<E, K>): boolean {
-        if (typeof key === 'function') {
-            return this.elements.find(key as Condition<E, K>) !== undefined
+    has(id: I): boolean
+    has(cond: Condition<E, I>): boolean
+    has(id: I | Condition<E, I>): boolean {
+        if (typeof id === 'function') {
+            return this.elements.find(id as Condition<E, I>) !== undefined
         }
-        return this.find(key) !== undefined
+        return this.find(id) !== undefined
     }
 
-    find(key: K): Readonly<E> | undefined {
-        const [index, found] = this.binarySearchIndex(key)
+    find(id: I): Readonly<E> | undefined {
+        const [index, found] = this.binarySearchIndex(id)
         if (!found) {
             return undefined
         }
         return this.elements[index]
     }
 
-    findAll(cond: Condition<E, K>): readonly E[] {
+    findAll(cond: Condition<E, I>): readonly E[] {
         return this.elements.filter(cond)
     }
 }

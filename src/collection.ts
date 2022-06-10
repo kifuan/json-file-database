@@ -1,20 +1,20 @@
 /**
  * The element will be used in collections.
- * @template K the type of id.
+ * @template I the type of id.
  */
- export interface Element<K> {
-    id: K
+ export interface Element<I> {
+    id: I
 }
 
 /**
  * The condition to to compare objects.
  */
-export type Condition<E extends Element<K>, K> = (obj: E) => boolean
+export type Condition<E extends Element<I>, I> = (obj: E) => boolean
 
 /**
  * The comparator to compare prime keys for objects.
  */
-export type Comparator<K> = (first: K, second: K) => number
+export type Comparator<I> = (first: I, second: I) => number
 
 /**
  * The function to save the collection.
@@ -26,7 +26,7 @@ export type Save = (name: string, elements: () => readonly any[]) => void
  * @template T the type of elements.
  * @template P the prime key of the type.
  */
-export interface InternalCollectionOptions<E extends Element<K>, K> {
+export interface InternalCollectionOptions<E extends Element<I>, I> {
     /**
      * The name of collection.
      */
@@ -35,7 +35,7 @@ export interface InternalCollectionOptions<E extends Element<K>, K> {
     /** 
      * The comparator to compare the elements.
      */
-    comparator: Comparator<K>
+    comparator: Comparator<I>
 
     /**
      * The elements for the collection.
@@ -62,7 +62,7 @@ export interface InternalCollectionOptions<E extends Element<K>, K> {
  * @template T the type of element.
  * @template P the prime key for element type.
  */
-export interface Collection<E extends Element<K>, K> extends Iterable<E> {
+export interface Collection<E extends Element<I>, I> extends Iterable<E> {
     /**
      * Inserts the element to the collection.
      * @param el the element to be inserted.
@@ -75,47 +75,47 @@ export interface Collection<E extends Element<K>, K> extends Iterable<E> {
      * @param el the element to be updated.
      * @returns whether it has updated the element.
      */
-    update(key: K, el: Partial<Omit<E, 'id'>>) : boolean
+    update(id: I, el: Partial<Omit<E, 'id'>>) : boolean
 
     /**
      * Removes the element.
      * @param el the element to be removed.
      * @returns whether it has removed the element.
      */
-    remove(key: K) : boolean
+    remove(id: I) : boolean
 
     /**
      * Removes all elements that match the condition.
      * @param cond the condition to match the element to be removed.
      * @returns the number of elements it has removed.
      */
-    removeAll(cond: Condition<E, K>) : number
+    removeAll(cond: Condition<E, I>) : number
 
     /**
      * Checks whether the element is in this collection.
      * @param el the element to be checked.
      * @returns whether the element is in this collection.
      */
-    has(key: K) : boolean
+    has(id: I) : boolean
 
     /**
      * Checks whether there is an element that matches the condition.
      * @param cond the condition to match the element to be checked.
      * @returns whether there is an element that matches the condition.
      */
-    has(cond: Condition<E, K>) : boolean
+    has(cond: Condition<E, I>) : boolean
 
     /**
      * Finds the element.
      * @param el the element to be found.
      * @returns the found element, or undefined if it hasn't found.
      */
-    find(key: K) : Readonly<E> | undefined
+    find(id: I) : Readonly<E> | undefined
 
     /**
      * Finds all elements that match given condition.
      * @param cond the condition to match the elements.
      * @returns all elements that match given condition.
      */
-    findAll(cond: Condition<E, K>) : readonly E[]
+    findAll(cond: Condition<E, I>) : readonly E[]
 }

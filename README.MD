@@ -31,8 +31,10 @@ import { connect } from 'json-file-database'
  */
 type User = { id: number, name: string }
 
-// Connect the database. If there is not the file yet,
-// it will create one after running this program.
+/**
+ * Connect the database.
+ * If there is not the file yet, it will create one after running this program.
+ */
 const db = connect({
     file: './db.json',
     init: {
@@ -44,42 +46,63 @@ const db = connect({
     }
 })
 
-// Specify the type of elements is User.
-// You can go to the documentations to see how to customize all
-// options, including the `comparator` to compare the elements.
+/**
+ * Specify the type of elements is User.
+ * 
+ * You can go to the documentations to see how to customize all
+ * options, including the `comparator` to compare the elements.
+ */
 const users = db<User>('users')
 
-// Find the user with id.
+/**
+ * Find the element with its id.
+ */
 console.log('The user whose id is 1:', users.find(1))
 
 
-// Find all users with given condition.
+/**
+ * Find all elements that match given condition.
+ */
 console.log('All users whose id <= 2 are:', users.findAll(u => u.id <= 2))
 
 
-// Check whether the collection has it.
+/**
+ * Check whether this collection has the element.
+ */
 console.log('Whether the collection has a user whose id is 5:', users.has(5))
 
 
-// Insert the user and return if it is succeeded.
+/**
+ * Insert an element and return whether it has been inserted.
+ */
 console.log('Insert a user whose id is 2:', users.insert({ id: 2, name: 'Liu Zhao' }))
 
 
-// List all users.
-// You can also use [...users], as it implemented Iterable.
+/**
+ * List all elements.
+ * 
+ * You can also use `[...users]` or `for...of` because
+ * it has implemented Iterable<E>.
+ */
 console.log('All users are:', Array.from(users))
 
 
-// Remove the user whose id is 1, and check whether it has removed the user.
+/**
+ * Remove the element and return whether it has been removed.
+ */
 console.log('Remove the user whose id is 1:', users.remove(1))
 
 
-// Remove all users that match the condition, and return the number of them.
+/**
+ * Remove all elements that match the condition, and return the number of them.
+ */
 console.log('Remove all users whose id < 3, the number of them is:',
         users.removeAll(u => u.id < 3)) 
 
 
-// Update the user with prime key, and return whether it has updated the user.
+/**
+ * Update the element with id, and return whether it has been updated.
+ */
 console.log('Update the user whose id is 3:', users.update(3, { name: 'Liu Zhao' }))
 ```
 

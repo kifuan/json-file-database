@@ -67,12 +67,12 @@ export interface InternalCollectionOptions<E extends Element<I>, I> {
  * 
  * Besides, you can also use `Array.from(collection)`, `[...collection]`,
  * or `for (const element of collection)` if you want, as it implemented
- * the Iterable<E>.
+ * `Iterable`.
  * 
  * @template E the type of elements.
  * @template I the type of id.
  */
-export interface Collection<E extends Element<I>, I> extends Iterable<E> {
+export interface Collection<E extends Element<I>, I> extends Iterable<Readonly<E>> {
     /**
      * Inserts the element to the collection.
      * @param el the element to be inserted.

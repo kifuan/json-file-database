@@ -27,7 +27,7 @@ export abstract class AbstractCollection<E extends Element<I>, I> implements Col
     abstract has(id: I): boolean
     abstract has(cond: Condition<E, I>): boolean
     abstract find(id: I): Readonly<E> | undefined
-    abstract [Symbol.iterator](): Iterator<E>
+    abstract [Symbol.iterator](): Iterator<Readonly<E>>
     
     findAll(cond: Condition<E, I>): readonly E[] {
         const result = []

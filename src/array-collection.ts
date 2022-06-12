@@ -1,4 +1,4 @@
-import { Collection, Element, InternalCollectionOptions, Comparator, Condition, Save } from './collection'
+import { Element, InternalCollectionOptions, Condition } from './collection'
 import { AbstractCollection } from './abstract-collection'
 
 export default class ArrayCollection<E extends Element<I>, I> extends AbstractCollection<E, I> {
@@ -12,7 +12,7 @@ export default class ArrayCollection<E extends Element<I>, I> extends AbstractCo
     /**
      * @returns the index to insert or get, and whether it has found the element. 
      */
-    private binarySearchIndex(id: I) : [number, boolean] {
+    private searchIndex(id: I) : [number, boolean] {
         let left = 0
         let right = this.elements.length - 1
 
@@ -32,14 +32,14 @@ export default class ArrayCollection<E extends Element<I>, I> extends AbstractCo
         return [left, false]
     }
 
-    *[Symbol.iterator]() : Iterator<E> {
-        for (let i = 0; i < this.elements.length; i++) {
-            yield this.elements[i]
+    *[Symbol.iterator]() : Iterator<Readonly<E>> {
+        for (const el of this.elements) {
+            yield el
         }
     }
 
     insert(el: E): boolean {
-        const [index, found] = this.binarySearchIndex(el.id)
+        const [index, found] = this.searchIndex(el.id)
         if (found) {
             return false
         }
@@ -49,7 +49,7 @@ export default class ArrayCollection<E extends Element<I>, I> extends AbstractCo
     }
 
     update(id: I, el: Partial<Omit<E, 'id'>>): boolean {
-        const [index, found] = this.binarySearchIndex(id)
+        const [index, found] = this.searchIndex(id)
         if (!found) {
             return false
         }
@@ -61,7 +61,7 @@ export default class ArrayCollection<E extends Element<I>, I> extends AbstractCo
 
     remove(id: I): boolean {
         // Removing elements won't make the array unsorted.
-        const [index, found] = this.binarySearchIndex(id)
+        const [index, found] = this.searchIndex(id)
         if (!found) {
             return false
         }
@@ -80,7 +80,7 @@ export default class ArrayCollection<E extends Element<I>, I> extends AbstractCo
     }
 
     find(id: I): Readonly<E> | undefined {
-        const [index, found] = this.binarySearchIndex(id)
+        const [index, found] = this.searchIndex(id)
         if (!found) {
             return undefined
         }

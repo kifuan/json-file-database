@@ -1,5 +1,5 @@
 import { AbstractCollection } from './abstract-collection'
-import { Collection, Element, Condition, Comparator, InternalCollectionOptions, Save } from './collection'
+import { Element, Condition, Comparator, InternalCollectionOptions } from './collection'
 
 type Node<E> = {
     el: E
@@ -7,7 +7,7 @@ type Node<E> = {
     left?: Node<E>
     right?: Node<E>
 }
-class AVLTree<E extends Element<I>, I> implements Iterable<E> {
+class AVLTree<E extends Element<I>, I> implements Iterable<Readonly<E>> {
     private root: Node<E> | undefined
     private comparator: Comparator<I>
 
@@ -15,7 +15,7 @@ class AVLTree<E extends Element<I>, I> implements Iterable<E> {
         this.comparator = comparator
     }
 
-    *[Symbol.iterator]() : Iterator<E> {
+    *[Symbol.iterator]() : Iterator<Readonly<E>> {
         // Inorder iteration
         if (this.root === undefined) {
             return
@@ -199,7 +199,7 @@ export default class AVLCollection<E extends Element<I>, I> extends AbstractColl
         options.elements.forEach(el => this.tree.insert(el))
     }
 
-    [Symbol.iterator](): Iterator<E> {
+    [Symbol.iterator](): Iterator<Readonly<E>> {
         return this.tree[Symbol.iterator]()
     }
 

@@ -133,7 +133,7 @@ Like the previous question, inserting or removing data is not friendly to **arra
 
 ### Insert
 
-Both are `O(log n)` to search the position to insert, but **array-based** collection needs to take another `O(n)` to insert the element, while **AVL-based** doesn't.
+**Array-based** collection is `O(n^2)`, while **AVL-based** is `O(n*log n)`.
 
 ### Update
 
@@ -141,11 +141,11 @@ Both are `O(log n)`.
 
 ### Remove
 
-**Array-based** collection is `O(n)`, while **AVL-based** is `O(log n)`
+**Array-based** collection is `O(n)`, while **AVL-based** is `O(log n)`.
 
 ### RemoveAll
 
-**Array-based** collection is `O(n^2)`, while **AVL-based** is `O(n*log n)`
+**Array-based** collection is `O(n^2)`, while **AVL-based** is `O(n*log n)`.
 
 ### Has
 

@@ -10,7 +10,7 @@ Click [here](https://kifuan.github.io/json-file-database/modules.html).
 
 + It uses "debouncd" function to save the data. This makes less IO operations.
 
-+ It uses binary-search(for collection typed `array`) or AVL-tree(for collection typed `avl`) to maintain the data. This means their time complexity would be `O(log n)`.
++ It uses binary-search(for collection typed `array`) or AVL-tree(for collection typed `avl`) to maintain the data. This means their best time complexity would be `O(log n)`.
 
 ## Usage
 
@@ -26,14 +26,14 @@ And then use it in your project like this:
 import { connect } from 'json-file-database'
 
 /**
- * The type of elements must have a `id` property
+ * The type of elements must have an `id` property
  * to make them unique and sorted in the collection.
  */
 type User = { id: number, name: string }
 
 /**
- * Connect the database.
- * If there is not the file yet, it will create one after running this program.
+ * Connect to the database.
+ * If there is not specified file yet, it will create one after running this program.
  */
 const db = connect({
     file: './db.json',
@@ -47,7 +47,7 @@ const db = connect({
 })
 
 /**
- * Specify the type of elements is User.
+ * Specify the type of elements is `User`.
  * 
  * You can go to the documentations to see how to customize all
  * options, including the `comparator` to compare the elements.
@@ -109,3 +109,56 @@ console.log('Update the user whose id is 3:', users.update(3, { name: 'Liu Zhao'
 At the first time you run, it will create a new file `db.json` and all outputs are expected. However, when you try to run it again, the outputs are not the same.
 
 This is because if there is no file, it will use the `init` property when you try to connect the database; otherwise it will read it directly.
+
+# FAQs
+
+## When and How to Use AVL-based Collection?
+
+You should use it only when you have to insert data very frequently.
+
+Here is an example to use it:
+
+```typescript
+const users = db<User>({
+    name: 'users',
+    type: 'avl'
+})
+```
+
+Normally, using **array-based** collection is enough, because saving **AVL-based** collection needs to convert it to an array(in JSON), which may be expensive cost when there is large data.
+
+## The Specific Time Complexity?
+
+Like the previous question, inserting or removing data is not friendly to **array-based** collection. However, `find` is usually what happens the most.
+
+### Insert
+
+Both are `O(log n)` to search the position to insert, but **array-based** collection needs to take another `O(n)` to insert the element, while **AVL-based** doesn't.
+
+### Update
+
+Both are `O(log n)`.
+
+### Remove
+
+**Array-based** collection is `O(n)`, while **AVL-based** is `O(log n)`
+
+### RemoveAll
+
+**Array-based** collection is `O(n^2)`, while **AVL-based** is `O(n*log n)`
+
+### Has
+
+Both are `O(log n)` when `id` is given, and `O(n)` when `cond` is given.
+
+### Find
+
+Both are `O(log n)` when `id` is given, and `O(n)` when `cond` is given.
+
+### FindAll
+
+Both are `O(n)`.
+
+### Save
+
+**Array-based** collection is `O(1)`, while **AVL-based** is `O(n)` with the space complexity of `S(n)` to create a new array.

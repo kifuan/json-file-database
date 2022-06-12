@@ -1,20 +1,12 @@
 import { Collection, Element, InternalCollectionOptions, Comparator, Condition, Save } from './collection'
+import { AbstractCollection } from './abstract-collection'
 
-export default class ArrayCollection<E extends Element<I>, I> implements Collection<E, I> {
-    private readonly comparator: Comparator<I>
-    private readonly name: string
+export default class ArrayCollection<E extends Element<I>, I> extends AbstractCollection<E, I> {
     private readonly elements: E[]
-    private readonly save: Save
 
     constructor(options: InternalCollectionOptions<E, I>) {
-        this.comparator = options.comparator
-        this.save = options.save
-        this.name = options.name
+        super(options, () => this.elements)
         this.elements = options.elements.sort((a, b) => this.comparator(a.id, b.id))
-    }
-
-    private startSaving() {
-        this.save(this.name, () => this.elements)
     }
 
     /**
@@ -78,17 +70,6 @@ export default class ArrayCollection<E extends Element<I>, I> implements Collect
         return true
     }
 
-    removeAll(cond: Condition<E, I>): number {
-        let length = 0
-        for (const el of this) {
-            if (cond(el)) {
-                length++
-                this.remove(el.id)
-            }
-        }
-        return length
-    }
-
     has(id: I): boolean
     has(cond: Condition<E, I>): boolean
     has(id: I | Condition<E, I>): boolean {
@@ -104,9 +85,5 @@ export default class ArrayCollection<E extends Element<I>, I> implements Collect
             return undefined
         }
         return this.elements[index]
-    }
-
-    findAll(cond: Condition<E, I>): readonly E[] {
-        return this.elements.filter(cond)
     }
 }

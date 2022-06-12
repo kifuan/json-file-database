@@ -1,3 +1,4 @@
+import { AbstractCollection } from './abstract-collection'
 import { Collection, Element, Condition, Comparator, InternalCollectionOptions, Save } from './collection'
 
 type Node<E> = {
@@ -189,19 +190,12 @@ class AVLTree<E extends Element<I>, I> implements Iterable<E> {
     }
 }
 
-export default class AVLCollection<E extends Element<I>, I> implements Collection<E, I> {
-    private readonly name: string
-    private readonly save: Save
+export default class AVLCollection<E extends Element<I>, I> extends AbstractCollection<E, I> {
     private readonly tree: AVLTree<E, I>
 
-    private startSaving() {
-        this.save(this.name, () => Array.from(this))
-    }
-
     constructor(options: InternalCollectionOptions<E, I>) {
-        this.save = options.save
-        this.name = options.name
-        this.tree = new AVLTree<E, I>(options.comparator)
+        super(options, () => Array.from(this))
+        this.tree = new AVLTree<E, I>(this.comparator)
         options.elements.forEach(el => this.tree.insert(el))
     }
 
@@ -231,17 +225,6 @@ export default class AVLCollection<E extends Element<I>, I> implements Collectio
         return result
     }
 
-    removeAll(cond: Condition<E, I>): number {
-        let length = 0
-        for (const el of this) {
-            if (cond(el)) {
-                length++
-                this.remove(el.id)
-            }
-        }
-        return length
-    }
-
     has(id: I): boolean
     has(cond: Condition<E, I>): boolean
     has(cond: I | Condition<E, I>): boolean {
@@ -259,17 +242,5 @@ export default class AVLCollection<E extends Element<I>, I> implements Collectio
 
     find(id: I): Readonly<E> | undefined {
         return this.tree.find(id)
-    }
-
-    findAll(cond: Condition<E, I>): readonly E[] {
-        const result: E[] = []
-
-        for (const el of this) {
-            if (cond(el)) {
-                result.push(el)
-            }
-        }
-
-        return result
     }
 }

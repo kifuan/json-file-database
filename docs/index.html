@@ -13,9 +13,11 @@
   <h2>Features</h2>
 </a>
 <ul>
-<li><p>It uses &quot;debouncd&quot; function to save the data. This makes less IO operations.</p>
+<li><p>Pure TypeScript. This helps you make fewer mistakes about types.</p>
 </li>
-<li><p>It uses binary-search(for collection typed <code>array</code>) or AVL-tree(for collection typed <code>avl</code>) to maintain the data. This means their best time complexity would be <code>O(log n)</code>.</p>
+<li><p>Whenever you change the collection, it will start a timer to save the data. If some changes happen during specified delay, it will <strong>restart</strong> the timer. This is so-called <strong>debouncing</strong>.</p>
+</li>
+<li><p>It uses binary-search(for collections typed <code>array</code>) or AVL-tree(for collections typed <code>avl</code>) to maintain the data. This means their best time complexity would be <code>O(log n)</code>.</p>
 </li>
 </ul>
 

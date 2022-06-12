@@ -8,9 +8,11 @@ Click [here](https://kifuan.github.io/json-file-database/modules.html).
 
 ## Features
 
-+ It uses "debouncd" function to save the data. This makes less IO operations.
++ Pure TypeScript. This helps you make fewer mistakes about types.
 
-+ It uses binary-search(for collection typed `array`) or AVL-tree(for collection typed `avl`) to maintain the data. This means their best time complexity would be `O(log n)`.
++ Whenever you change the collection, it will start a timer to save the data. If some changes happen during specified delay, it will **restart** the timer. This is so-called **debouncing**.
+
++ It uses binary-search(for collections typed `array`) or AVL-tree(for collections typed `avl`) to maintain the data. This means their best time complexity would be `O(log n)`.
 
 ## Usage
 

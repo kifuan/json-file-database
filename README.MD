@@ -133,34 +133,17 @@ Normally, using **array-based** collection is enough, because saving **AVL-based
 
 Like the previous question, inserting or removing data is not friendly to **array-based** collection. However, `find` is usually what happens the most.
 
-### Insert
+| Type             | Array-based | AVL-based    |
+| ---------------- | ----------- | ------------ |
+| Insert           | `O(n)`      | `O(log n)`   |
+| Update           | `O(log n)`  | `O(log n)`   |
+| Remove           | `O(n)`      | `O(log n)`   |
+| RemoveAll        | `O(n^2)`    | `O(n*log n)` |
+| Has (id)         | `O(log n)`  | `O(log n)`   |
+| Has (condition)  | `O(n)`      | `O(n)`       |
+| Find (id)        | `O(log n)`  | `O(log n)`   |
+| Find (condition) | `O(n)`      | `O(n)`       |
+| FindAll          | `O(n)`      | `O(n)`       |
+| Save             | `O(1)`      | `O(n)`       |
 
-**Array-based** collection is `O(n^2)`, while **AVL-based** is `O(n*log n)`.
-
-### Update
-
-Both are `O(log n)`.
-
-### Remove
-
-**Array-based** collection is `O(n)`, while **AVL-based** is `O(log n)`.
-
-### RemoveAll
-
-**Array-based** collection is `O(n^2)`, while **AVL-based** is `O(n*log n)`.
-
-### Has
-
-Both are `O(log n)` when `id` is given, and `O(n)` when `cond` is given.
-
-### Find
-
-Both are `O(log n)` when `id` is given, and `O(n)` when `cond` is given.
-
-### FindAll
-
-Both are `O(n)`.
-
-### Save
-
-**Array-based** collection is `O(1)`, while **AVL-based** is `O(n)` with the space complexity of `S(n)` to create a new array.
+Besides, the space complexity of **AVL-based** collection is `S(n)` to create a new array.

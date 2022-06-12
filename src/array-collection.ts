@@ -57,12 +57,12 @@ export default class ArrayCollection<E extends Element<I>, I> implements Collect
     }
 
     update(id: I, el: Partial<Omit<E, 'id'>>): boolean {
-        const found = this.find(id)
-        if (found === undefined) {
+        const [index, found] = this.binarySearchIndex(id)
+        if (!found) {
             return false
         }
         // We need to change the found result.
-        Object.assign(found, el)
+        Object.assign(this.elements[index], el)
         this.startSaving()
         return true
     }
@@ -79,9 +79,13 @@ export default class ArrayCollection<E extends Element<I>, I> implements Collect
     }
 
     removeAll(cond: Condition<E, I>): number {
-        const elements = this.findAll(cond)
-        const length = elements.length
-        elements.forEach(el => this.remove(el.id))
+        let length = 0
+        for (const el of this) {
+            if (cond(el)) {
+                length++
+                this.remove(el.id)
+            }
+        }
         return length
     }
 

@@ -216,7 +216,7 @@ export default class AVLCollection<E extends Element<I>, I> implements Collectio
     }
 
     update(id: I, el: Partial<Omit<E, 'id'>>): boolean {
-        const obj = this.find(id)
+        const obj = this.tree.find(id)
         if (obj === undefined) {
             return false
         }
@@ -232,9 +232,13 @@ export default class AVLCollection<E extends Element<I>, I> implements Collectio
     }
 
     removeAll(cond: Condition<E, I>): number {
-        const elements = this.findAll(cond)
-        const length = elements.length
-        elements.forEach(el => this.remove(el.id))
+        let length = 0
+        for (const el of this) {
+            if (cond(el)) {
+                length++
+                this.remove(el.id)
+            }
+        }
         return length
     }
 
@@ -242,9 +246,15 @@ export default class AVLCollection<E extends Element<I>, I> implements Collectio
     has(cond: Condition<E, I>): boolean
     has(cond: I | Condition<E, I>): boolean {
         if (typeof cond === 'function') {
-            return this.findAll(cond as Condition<E, I>).length !== 0
+            cond = cond as Condition<E, I>
+            for (const el of this) {
+                if (cond(el)) {
+                    return true
+                }
+            }
+            return false
         }
-        return this.find(cond) !== undefined
+        return this.tree.find(cond) !== undefined
     }
 
     find(id: I): Readonly<E> | undefined {

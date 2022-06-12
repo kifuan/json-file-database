@@ -137,12 +137,12 @@ Like the previous question, inserting or removing data is not friendly to **arra
 | --------------- | ----------- | ------------ |
 | Insert          | `O(n)`      | `O(log n)`   |
 | Update          | `O(log n)`  | `O(log n)`   |
-| Remove          | `O(n)`      | `O(log n)`   |
-| Remove All      | `O(n^2)`    | `O(n*log n)` |
+| Find            | `O(log n)`  | `O(log n)`   |
 | Has (id)        | `O(log n)`  | `O(log n)`   |
 | Has (condition) | `O(n)`      | `O(n)`       |
-| Find            | `O(log n)`  | `O(log n)`   |
+| Remove          | `O(n)`      | `O(log n)`   |
+| Remove All      | `O(n^2)`    | `O(n*log n)` |
 | Find All        | `O(n)`      | `O(n)`       |
 | Save            | `O(1)`      | `O(n)`       |
 
-Besides, the space complexity of **AVL-based** collection is `S(n)` to create a new array.
+Besides, the space complexity of **AVL-based** collection to be saved is `S(n)` because a new array will be created(as it should be stored to a JSON file).

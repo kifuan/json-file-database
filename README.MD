@@ -84,7 +84,7 @@ console.log('Insert a user whose id is 2:', users.insert({ id: 2, name: 'Liu Zha
  * List all elements.
  * 
  * You can also use `[...users]` or `for...of` because
- * it has implemented Iterable<E>.
+ * it has implemented Iterable.
  */
 console.log('All users are:', Array.from(users))
 

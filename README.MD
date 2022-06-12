@@ -133,17 +133,16 @@ Normally, using **array-based** collection is enough, because saving **AVL-based
 
 Like the previous question, inserting or removing data is not friendly to **array-based** collection. However, `find` is usually what happens the most.
 
-| Type             | Array-based | AVL-based    |
-| ---------------- | ----------- | ------------ |
-| Insert           | `O(n)`      | `O(log n)`   |
-| Update           | `O(log n)`  | `O(log n)`   |
-| Remove           | `O(n)`      | `O(log n)`   |
-| RemoveAll        | `O(n^2)`    | `O(n*log n)` |
-| Has (id)         | `O(log n)`  | `O(log n)`   |
-| Has (condition)  | `O(n)`      | `O(n)`       |
-| Find (id)        | `O(log n)`  | `O(log n)`   |
-| Find (condition) | `O(n)`      | `O(n)`       |
-| FindAll          | `O(n)`      | `O(n)`       |
-| Save             | `O(1)`      | `O(n)`       |
+| Operation       | Array-based | AVL-based    |
+| --------------- | ----------- | ------------ |
+| Insert          | `O(n)`      | `O(log n)`   |
+| Update          | `O(log n)`  | `O(log n)`   |
+| Remove          | `O(n)`      | `O(log n)`   |
+| Remove All      | `O(n^2)`    | `O(n*log n)` |
+| Has (id)        | `O(log n)`  | `O(log n)`   |
+| Has (condition) | `O(n)`      | `O(n)`       |
+| Find            | `O(log n)`  | `O(log n)`   |
+| Find All        | `O(n)`      | `O(n)`       |
+| Save            | `O(1)`      | `O(n)`       |
 
 Besides, the space complexity of **AVL-based** collection is `S(n)` to create a new array.

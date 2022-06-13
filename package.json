@@ -1,6 +1,6 @@
 {
     "name": "json-file-database",
-    "version": "1.6.13",
+    "version": "1.6.14",
     "description": "Lightweight Database on NodeJS by JSON Files",
     "keywords": [
         "lightweight",

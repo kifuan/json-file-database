@@ -153,4 +153,4 @@ Yes, there are some tests for performance. Here is the result on my machine:
 
 ![The Result of Tests](https://github.com/kifuan/json-file-database/blob/HEAD/performance.jpg)
 
-However, performance depends on many factors, and we can't judge it simply by the running time. But we can see that array-based collections is **not good at removing elements** for sure :(.
+However, performance depends on many factors, and we can't judge it simply by the running time. But we can see that array-based collection is **not good at removing elements** for sure :(.

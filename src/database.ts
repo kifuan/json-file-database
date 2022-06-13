@@ -15,7 +15,7 @@ export interface CollectionOptions<I> {
 
     /**
      * The comparator to compare the elements.
-     * @default (a,b)=>a-b
+     * It will compare elements using built-in operators by default.
      */
     comparator?: Comparator<I>
 
@@ -91,14 +91,6 @@ export interface Database {
     <E extends Element<number>>(name: string): Collection<E, number>
 }
 
-function readDatabaseFile(file: DatabaseFile, init: JSONData) : JSONData {
-    try {
-        return JSON.parse(file.read())
-    } catch (err) {
-        return init
-    }
-}
-
 function getDataSaver(data: JSONData, delay: number, file: DatabaseFile, onSaved: () => void) : Save {
     let timeout: NodeJS.Timeout | undefined
     return (name, elements) => {
@@ -111,22 +103,34 @@ function getDataSaver(data: JSONData, delay: number, file: DatabaseFile, onSaved
     }
 }
 
+function withDefaults<T>(data: T, defaults: Partial<T>) : Required<T> {
+    return Object.keys(defaults).reduce((data, key) => {
+        const data1 = data as any
+        const defaults1 = defaults as any
+        data1[key] ??= defaults1[key]
+        return data
+    }, data) as Required<T>
+}
+
 function createDatabase(data: JSONData, save: Save) : Database {
     return (options: any) => {
         if (typeof options === 'string') {
             const name = options
             options = { name }
         }
-        let { name, comparator, type } = options
-        comparator ||= (first: any, second: any) => {
-            if (first > second) {
-                return 1
-            } else if (first < second) {
-                return -1
-            }
-            return 0
-        }
-        type ||= 'array'
+
+        // Make options with default values.
+        const { name, comparator, type } = withDefaults(options, {
+            comparator: (first: any, second: any) => {
+                if (first > second) {
+                    return 1
+                } else if (first < second) {
+                    return -1
+                }
+                return 0
+            },
+            type: 'array',
+        })
 
         // Make sure the property is an array.
         const elements: readonly any[] = data[name] ||= []
@@ -134,8 +138,10 @@ function createDatabase(data: JSONData, save: Save) : Database {
             throw new TypeError(`Property ${name} in the database is not an array.`)
         }
 
+        // Make collection options.
         const collOptions = { name, comparator, elements, save }
-
+        
+        // And use the "strategy" design pattern to create the collection object.
         const types = {
             array: () => new ArrayCollection<any, any>(collOptions),
             avl: () => new AVLCollection<any, any>(collOptions)
@@ -153,16 +159,24 @@ function createDatabase(data: JSONData, save: Save) : Database {
  * @returns the database.
  */
 export function connect(options: DatabaseOptions) : Database {
-    let { file, delay, onSaved, init } = options
+    // Make the options with default values.
+    let { file, delay, onSaved, init } = withDefaults(options, {
+        delay: 0,
+        init: {},
+        onSaved: () => {},
+    })
+
     if (typeof file === 'string') {
         file = createFile(file)
     }
 
-    delay ||= 0
-    onSaved ||= () => {}
-    init ||= {}
-
-    const data = readDatabaseFile(file, init)
+    // Read the file, or set the data as init.
+    let data: JSONData
+    try {
+        data = JSON.parse(file.read())
+    } catch (e) {
+        data = init
+    }
     const save = getDataSaver(data, delay, file, onSaved)
 
     return createDatabase(data, save)

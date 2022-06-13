@@ -149,7 +149,7 @@ Besides, the space complexity of **AVL-based** collection to be saved is `S(n)` 
 
 ## Any Test for Performance?
 
-Yes, I write some tests for performance. Here are the result on my machine:
+Yes, there are some tests for performance. Here is the result on my machine:
 
 ![The Result of Tests](./performance.jpg)
 

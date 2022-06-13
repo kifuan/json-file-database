@@ -1,22 +1,29 @@
 import test, { ExecutionContext } from 'ava'
 import { Collection, connect, createObjectFile } from '../src'
 
-type User = { id: number, n: number }
+type User = { id: number }
 
 function testPerformance(t: ExecutionContext, users: Collection<User, number>, type: string) {
     const insertStart = Date.now()
-    for (let i = 0; i < 50000; i++) {
-        users.insert({ id: i, n: i + 1 })
+    for (let i = 0; i < 100000; i++) {
+        users.insert({ id: i })
     }
     const insertTime = Date.now() - insertStart
-    t.log(`Spent ${insertTime}ms to insert 50k items for ${type}.`)
+    t.log(`Used ${insertTime}ms to insert 100k items for ${type}.`)
     
     const findStart = Date.now()
-    for (const id of [1, 10000, 25000, 30000, 49999]) {
-        t.deepEqual(users.find(id), { id, n: id+1 })
+    for (let i = 0; i < 100000; i++) {
+        t.true(users.has(i))
     }
-    const findTime = (Date.now() - findStart) / 5
-    t.log(`Spent ${findTime.toFixed(2)}ms in average to find in 50k items for ${type}.`)
+    const findTime = Date.now() - findStart
+    t.log(`Used ${findTime}ms to find 100k items for ${type}.`)
+
+    const removeStart = Date.now()
+    for (let i = 45000; i < 55001; i++) {
+        t.true(users.remove(i))
+    }
+    const removeTime = Date.now() - removeStart
+    t.log(`Used ${removeTime}ms to remove 10k items for ${type}.`)
 }
 
 const arrayUsers = connect({
@@ -34,6 +41,6 @@ const avlUsers = connect({
     type: 'avl'
 })
 
-test('array', t => testPerformance(t, arrayUsers, 'array'))
+test.serial('array', t => testPerformance(t, arrayUsers, 'array'))
 
-test('avl', t => testPerformance(t, avlUsers, 'avl'))
+test.serial('avl', t => testPerformance(t, avlUsers, 'avl'))

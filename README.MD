@@ -146,3 +146,11 @@ Like the previous question, inserting or removing data is not friendly to **arra
 | Save            | `O(1)`      | `O(n)`       |
 
 Besides, the space complexity of **AVL-based** collection to be saved is `S(n)` because a new array will be created(as it should be stored to a JSON file).
+
+## Any Test for Performance?
+
+Yes, I write some tests for performance. Here are the result on my machine:
+
+![The Result of Tests](./performance.jpg)
+
+However, performance depends on many factors, and we can't judge it simply by the running time. But we can see that array-based collections is **not good at removing elements** for sure :(.

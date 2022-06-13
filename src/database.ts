@@ -118,7 +118,14 @@ function createDatabase(data: JSONData, save: Save) : Database {
             options = { name }
         }
         let { name, comparator, type } = options
-        comparator ||= (first: any, second: any) => first - second
+        comparator ||= (first: any, second: any) => {
+            if (first > second) {
+                return 1
+            } else if (first < second) {
+                return -1
+            }
+            return 0
+        }
         type ||= 'array'
 
         // Make sure the property is an array.

@@ -50,18 +50,6 @@ export function stringId(t: Test, type: 'array' | 'avl') {
     // "over the lazy dog", here we don't use "the" to make elements unique.
     const insertArr = [ 'over', 'lazy', 'dog' ]
 
-    const comparator = (s1: string, s2: string) => {
-        if (s1 > s2) {
-            return 1
-        }
-        
-        if (s1 < s2) {
-            return -1
-        }
-
-        return 0
-    }
-
     const db = connect({
         file: createObjectFile({
             words: wordsArr.map(w => ({ id: w }))
@@ -70,11 +58,11 @@ export function stringId(t: Test, type: 'array' | 'avl') {
 
     const words = db<{ id: string }, string>({
         name: 'words',
-        type, comparator
+        type
     })
 
     insertArr.forEach(i => words.insert({ id: i }))
-    const expected = wordsArr.concat(insertArr).sort(comparator)
+    const expected = wordsArr.concat(insertArr).sort()
     const actual = Array.from(words).map(w => w.id)
 
     t.deepEqual(expected, actual)

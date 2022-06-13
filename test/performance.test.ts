@@ -18,6 +18,13 @@ function testPerformance(t: ExecutionContext, users: Collection<User, number>, t
     const findTime = Date.now() - findStart
     t.log(`Used ${findTime}ms to find 100k items for ${type}.`)
 
+    const findCondStart = Date.now()
+    for (let i = 49950; i < 50051; i++) {
+        t.true(users.has(u => u.id === i))
+    }
+    const findCondTime = Date.now() - findCondStart
+    t.log(`Used ${findCondTime}ms to find 0.1k items with condition for ${type}.`)
+
     const removeStart = Date.now()
     for (let i = 45000; i < 55001; i++) {
         t.true(users.remove(i))
@@ -41,6 +48,6 @@ const avlUsers = connect({
     type: 'avl'
 })
 
-test.serial('array', t => testPerformance(t, arrayUsers, 'array'))
+test('array', t => testPerformance(t, arrayUsers, 'array'))
 
-test.serial('avl', t => testPerformance(t, avlUsers, 'avl'))
+test('avl', t => testPerformance(t, avlUsers, 'avl'))

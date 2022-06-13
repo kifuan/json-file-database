@@ -48,6 +48,6 @@ const avlUsers = connect({
     type: 'avl'
 })
 
-test('array', t => testPerformance(t, arrayUsers, 'array'))
+test.skip('array', t => testPerformance(t, arrayUsers, 'array'))
 
-test('avl', t => testPerformance(t, avlUsers, 'avl'))
+test.skip('avl', t => testPerformance(t, avlUsers, 'avl'))
